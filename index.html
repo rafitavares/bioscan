@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BioScan — Avaliação Física por IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0F1A;--bg-card:#131929;--bg-card2:#1A2035;
+  --cyan:#00D4FF;--cyan-dim:rgba(0,212,255,0.12);
+  --purple:#7C3AED;--green:#10B981;--amber:#F59E0B;--red:#EF4444;
+  --text:#F0F4FF;--muted:#7A8BA8;--border:rgba(0,212,255,0.15);
+}
+html{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* ── CONFIG ── */
+.config-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1.25rem}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--cyan);letter-spacing:-0.03em;margin-bottom:.375rem}
+.logo span{color:var(--text)}
+.tagline{color:var(--muted);font-size:.875rem;margin-bottom:2.5rem;text-align:center;line-height:1.6}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;width:100%;max-width:420px}
+.card h2{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:.375rem}
+.card p{color:var(--muted);font-size:.82rem;margin-bottom:1.375rem;line-height:1.65}
+.lbl{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.4rem;letter-spacing:.03em}
+input[type=text],input[type=password],input[type=number]{
+  width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  padding:.7rem .9rem;color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none
+}
+input:focus{border-color:var(--cyan)}
+.btn-primary{
+  width:100%;padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;
+  border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:1rem;
+  font-weight:700;cursor:pointer;margin-top:1.25rem;transition:opacity .2s,transform .1s;letter-spacing:.02em
+}
+.btn-primary:hover{opacity:.9}
+.btn-primary:active{transform:scale(.98)}
+.warn-box{
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;
+  padding:.75rem .9rem;font-size:.78rem;color:var(--amber);margin-top:.875rem;line-height:1.55
+}
+.link-info{font-size:.78rem;color:var(--muted);text-align:center;margin-top:1rem;line-height:1.6}
+.link-info a{color:var(--cyan);text-decoration:none}
+
+/* ── MAIN ── */
+.main-screen{display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.hlogo{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:var(--cyan)}
+.hlogo span{color:var(--text)}
+.btn-sm{
+  background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;
+  padding:.35rem .7rem;font-size:.78rem;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .2s,color .2s
+}
+.btn-sm:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.measures{padding:.875rem 1.25rem .5rem;flex-shrink:0}
+.measures-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.measure-input{
+  font-size:1.15rem!important;font-family:'Space Grotesk',sans-serif!important;
+  font-weight:600!important;padding:.55rem .75rem!important;text-align:center
+}
+
+.cam-wrap{position:relative;width:100%;flex:1;min-height:0;background:#000;overflow:hidden}
+#video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-overlay{position:absolute;inset:0;pointer-events:none}
+
+.scan-grid{
+  position:absolute;inset:0;opacity:0;
+  background-image:linear-gradient(rgba(0,212,255,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,.07) 1px,transparent 1px);
+  background-size:42px 42px;transition:opacity .5s
+}
+.scan-grid.on{opacity:1}
+
+.scan-beam{
+  position:absolute;left:0;right:0;height:3px;
+  background:var(--cyan);box-shadow:0 0 18px var(--cyan),0 0 36px rgba(0,212,255,.4);
+  opacity:0
+}
+.scan-beam.on{opacity:1;animation:beam 2.2s ease-in-out infinite}
+@keyframes beam{0%{top:0%}50%{top:96%}100%{top:0%}}
+
+.corners{position:absolute;inset:0}
+.c{position:absolute;width:22px;height:22px;border-color:var(--cyan);border-style:solid;opacity:.85}
+.c-tl{top:14px;left:14px;border-width:2px 0 0 2px}
+.c-tr{top:14px;right:14px;border-width:2px 2px 0 0}
+.c-bl{bottom:14px;left:14px;border-width:0 0 2px 2px}
+.c-br{bottom:14px;right:14px;border-width:0 2px 2px 0}
+
+.countdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,15,26,.65);opacity:0;transition:opacity .3s}
+.countdown.on{opacity:1}
+.cnum{font-family:'Space Grotesk',sans-serif;font-size:7rem;font-weight:700;color:var(--cyan);text-shadow:0 0 28px rgba(0,212,255,.6);animation:cpulse 1s ease-out}
+@keyframes cpulse{0%{transform:scale(1.4);opacity:0}100%{transform:scale(1);opacity:1}}
+
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1rem;background:var(--bg-card);flex-shrink:0}
+.status-txt{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sdot.ready{background:var(--green);animation:dp 2s infinite}
+.sdot.scanning{background:var(--cyan);animation:dp .5s infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.25}}
+
+.controls{padding:.875rem 1.25rem;display:flex;gap:.75rem;align-items:center;flex-shrink:0}
+.btn-scan{
+  flex:1;padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;border-radius:12px;
+  font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;
+  transition:opacity .2s,transform .1s;letter-spacing:.03em
+}
+.btn-scan:disabled{opacity:.35;cursor:not-allowed}
+.btn-scan:not(:disabled):hover{opacity:.9}
+.btn-scan:not(:disabled):active{transform:scale(.98)}
+.btn-flip{
+  width:46px;height:46px;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:1.2rem;flex-shrink:0;transition:border-color .2s,color .2s
+}
+.btn-flip:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.hint{padding:0 1.25rem .875rem;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.65;flex-shrink:0}
+
+/* ── RESULTS ── */
+.results-screen{display:flex;flex-direction:column}
+.results-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.results-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600}
+
+.thumb-wrap{position:relative;width:100%;background:#000;flex-shrink:0}
+#captureThumb{width:100%;display:block;object-fit:cover;max-height:52vh}
+.thumb-badge{
+  position:absolute;bottom:10px;right:10px;background:rgba(11,15,26,.8);
+  border:1px solid var(--border);border-radius:8px;padding:.35rem .65rem;
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--cyan)
+}
+
+.results-body{flex:1;overflow-y:auto;padding:1.25rem}
+
+.loading-state{text-align:center;padding:2.5rem 1rem}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.25rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-lbl{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--cyan)}
+.loading-sub{font-size:.78rem;color:var(--muted);margin-top:.4rem}
+.steps{margin-top:1.5rem;text-align:left;display:inline-block}
+.step{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);padding:.2rem 0;opacity:0;transition:opacity .4s,color .4s}
+.step.on{opacity:1;color:var(--cyan)}
+.step.done{opacity:.6;color:var(--green)}
+
+.results-out{display:none}
+.results-card{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:16px;
+  padding:1.375rem;font-size:.88rem;line-height:1.8;color:var(--text)
+}
+.results-card h3{
+  font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;
+  color:var(--cyan);margin:1.25rem 0 .5rem;padding-bottom:.375rem;
+  border-bottom:1px solid var(--cyan-dim)
+}
+.results-card h3:first-child{margin-top:0}
+.disclaimer{
+  background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);
+  border-radius:10px;padding:.875rem 1rem;font-size:.78rem;color:#A78BFA;
+  margin-top:1rem;line-height:1.6
+}
+.err-box{
+  background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.28);
+  border-radius:12px;padding:1.25rem;color:#FCA5A5;font-size:.87rem;line-height:1.7
+}
+
+.btn-new{
+  width:100%;padding:.875rem;background:transparent;color:var(--cyan);
+  border:1px solid rgba(0,212,255,.35);border-radius:12px;
+  font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;
+  cursor:pointer;margin-top:1.25rem;transition:background .2s
+}
+.btn-new:hover{background:var(--cyan-dim)}
+
+canvas{display:none}
+</style>
+</head>
+<body>
+
+<!-- ── CONFIG SCREEN ── -->
+<div id="configScreen" class="screen active">
+  <div class="config-wrap">
+    <div class="logo">Bio<span>Scan</span></div>
+    <p class="tagline">Avaliação física e postural por inteligência artificial.<br>Composição corporal · Postura · Assimetrias</p>
+
+    <div class="card">
+      <h2>Configurar chave de API</h2>
+      <p>O BioScan usa o Claude (Anthropic) para analisar as imagens. Você precisa de uma chave de API, que pode ser criada gratuitamente em <strong>console.anthropic.com</strong>.</p>
+      <label class="lbl">CHAVE DE API (claude)</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" />
+      <button class="btn-primary" onclick="saveConfig()">Salvar e Começar →</button>
+      <div class="warn-box">⚠ A chave é salva apenas localmente neste dispositivo e nunca enviada para servidores do app. Recomendamos configurar um limite de gastos na conta Anthropic.</div>
+    </div>
+
+    <p class="link-info">Precisa de uma chave? <a href="https://console.anthropic.com/settings/keys" target="_blank">Criar em console.anthropic.com →</a></p>
+  </div>
+</div>
+
+<!-- ── MAIN SCREEN ── -->
+<div id="mainScreen" class="screen main-screen">
+  <header>
+    <div class="hlogo">Bio<span>Scan</span></div>
+    <button class="btn-sm" onclick="showConfig()">⚙ API</button>
+  </header>
+
+  <div class="measures">
+    <div class="measures-grid">
+      <div>
+        <label class="lbl">PESO ATUAL (kg)</label>
+        <input type="number" id="weight" class="measure-input" placeholder="75" min="30" max="300" inputmode="decimal" />
+      </div>
+      <div>
+        <label class="lbl">ALTURA (cm)</label>
+        <input type="number" id="height" class="measure-input" placeholder="170" min="100" max="230" inputmode="decimal" />
+      </div>
+    </div>
+  </div>
+
+  <div class="cam-wrap" id="camWrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <div class="cam-overlay">
+      <div class="scan-grid" id="scanGrid"></div>
+      <div class="scan-beam" id="scanBeam"></div>
+      <div class="corners">
+        <div class="c c-tl"></div>
+        <div class="c c-tr"></div>
+        <div class="c c-bl"></div>
+        <div class="c c-br"></div>
+      </div>
+      <div class="countdown" id="countdown">
+        <span class="cnum" id="cnum">3</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span class="status-txt" id="statusTxt">aguardando câmera…</span>
+    <div class="sdot" id="sdot"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-scan" id="btnScan" onclick="startScan()" disabled>Iniciar Scan</button>
+    <button class="btn-flip" onclick="flipCamera()" title="Trocar câmera">⟳</button>
+  </div>
+
+  <p class="hint">Fique em pé, de frente para a câmera, com o corpo todo visível.<br>Roupas justas garantem maior precisão na avaliação.</p>
+</div>
+
+<!-- ── RESULTS SCREEN ── -->
+<div id="resultsScreen" class="screen results-screen">
+  <div class="results-hdr">
+    <span class="results-title">Relatório BioScan</span>
+    <button class="btn-sm" onclick="backToMain()">← Voltar</button>
+  </div>
+
+  <div class="thumb-wrap">
+    <img id="captureThumb" alt="Foto capturada" />
+    <div class="thumb-badge" id="thumbBadge">IMC —</div>
+  </div>
+
+  <div class="results-body">
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <div class="loading-lbl">Analisando com IA…</div>
+      <div class="loading-sub">Pode levar alguns segundos</div>
+      <div class="steps">
+        <div class="step on" id="s1">▸ Processando imagem…</div>
+        <div class="step" id="s2">▸ Estimando composição corporal…</div>
+        <div class="step" id="s3">▸ Avaliando postura e alinhamento…</div>
+        <div class="step" id="s4">▸ Gerando recomendações…</div>
+      </div>
+    </div>
+
+    <div class="results-out" id="resultsOut">
+      <div class="results-card" id="resultsCard"></div>
+      <div class="disclaimer">
+        ⚠ <strong>Aviso:</strong> Esta avaliação é uma estimativa visual gerada por inteligência artificial com fins educativos e informativos. Não substitui avaliação de médico, fisioterapeuta ou educador físico. Consulte um profissional de saúde para diagnóstico preciso.
+      </div>
+      <button class="btn-new" onclick="backToMain()">+ Novo Scan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+let stream=null, facingMode='user';
+
+// ── INIT ──
+window.addEventListener('load',()=>{
+  if(localStorage.getItem('bioscan_key')) showMain();
+});
+
+function saveConfig(){
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk-ant-…');return;}
+  localStorage.setItem('bioscan_key',k);
+  showMain();
+}
+function showConfig(){
+  const k=localStorage.getItem('bioscan_key')||'';
+  document.getElementById('apiKeyInput').value=k;
+  showScreen('configScreen');
+  stopCamera();
+}
+function showMain(){
+  showScreen('mainScreen');
+  initCamera();
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── CAMERA ──
+async function initCamera(){
+  try{
+    stopCamera();
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode,width:{ideal:1080},height:{ideal:1440}},audio:false
+    });
+    const v=document.getElementById('video');
+    v.srcObject=stream;
+    v.style.transform=facingMode==='user'?'scaleX(-1)':'scaleX(1)';
+    setStatus('ready','câmera ativa — pronto para scan');
+    document.getElementById('btnScan').disabled=false;
+  }catch(e){
+    setStatus('','erro ao acessar câmera: '+e.message);
+    document.getElementById('btnScan').disabled=true;
+  }
+}
+function stopCamera(){
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+}
+function flipCamera(){
+  facingMode=facingMode==='user'?'environment':'user';
+  initCamera();
+}
+function setStatus(state,txt){
+  document.getElementById('statusTxt').textContent=txt;
+  const d=document.getElementById('sdot');
+  d.className='sdot'+(state?' '+state:'');
+}
+
+// ── SCAN FLOW ──
+async function startScan(){
+  const w=document.getElementById('weight').value;
+  const h=document.getElementById('height').value;
+  if(!w||!h){alert('Informe peso e altura antes de iniciar o scan.');return;}
+
+  document.getElementById('btnScan').disabled=true;
+  setStatus('scanning','preparando scan…');
+
+  // Countdown
+  const cd=document.getElementById('countdown');
+  const cn=document.getElementById('cnum');
+  cd.classList.add('on');
+  for(let i=3;i>=1;i--){
+    cn.textContent=i;
+    cn.style.animation='none';
+    cn.offsetHeight;
+    cn.style.animation='cpulse 1s ease-out';
+    await sleep(1000);
+  }
+  cd.classList.remove('on');
+
+  // Scanning animation
+  setStatus('scanning','escaneando…');
+  document.getElementById('scanGrid').classList.add('on');
+  document.getElementById('scanBeam').classList.add('on');
+  await sleep(2400);
+
+  // Capture frame
+  const imgData=captureFrame();
+
+  document.getElementById('scanGrid').classList.remove('on');
+  document.getElementById('scanBeam').classList.remove('on');
+
+  // Calc BMI for badge
+  const bmi=(parseFloat(w)/Math.pow(parseFloat(h)/100,2)).toFixed(1);
+
+  // Switch to results
+  resetResultsUI();
+  document.getElementById('captureThumb').src=imgData;
+  document.getElementById('thumbBadge').textContent='IMC '+bmi+' · '+bmiCat(bmi);
+  showScreen('resultsScreen');
+
+  // Progressive step animation
+  const delays=[0,2500,6000,10000];
+  delays.forEach((d,i)=>setTimeout(()=>{
+    if(i>0)document.getElementById('s'+i).className='step done';
+    document.getElementById('s'+(i+1)).className='step on';
+  },d));
+
+  // Call API
+  try{
+    const result=await analyze(imgData,w,h,bmi);
+    showResults(result);
+  }catch(err){
+    showError(err.message);
+  }
+
+  document.getElementById('btnScan').disabled=false;
+  setStatus('ready','câmera ativa — pronto para scan');
+}
+
+function captureFrame(){
+  const v=document.getElementById('video');
+  const c=document.getElementById('canvas');
+  c.width=v.videoWidth;
+  c.height=v.videoHeight;
+  const ctx=c.getContext('2d');
+  if(facingMode==='user'){ctx.translate(c.width,0);ctx.scale(-1,1);}
+  ctx.drawImage(v,0,0);
+  return c.toDataURL('image/jpeg',.88);
+}
+
+function resetResultsUI(){
+  document.getElementById('loadingState').style.display='block';
+  document.getElementById('resultsOut').style.display='none';
+  ['s1','s2','s3','s4'].forEach((id,i)=>{
+    document.getElementById(id).className='step'+(i===0?' on':'');
+  });
+}
+
+// ── CLAUDE API ──
+async function analyze(imgDataUrl,weight,height,bmi){
+  const key=localStorage.getItem('bioscan_key');
+  const b64=imgDataUrl.split(',')[1];
+
+  const system=`Você é um especialista sênior em avaliação física, biomecânica postural e fisiologia do exercício. Analise imagens de pessoas e produza avaliações completas, honestas e específicas. Nunca seja genérico. Se não puder ver algo com clareza, diga isso explicitamente em vez de inventar dados.`;
+
+  const prompt=`Analise esta pessoa com os seguintes dados mensurados:
+• Peso: ${weight} kg
+• Altura: ${height} cm
+• IMC: ${bmi} (${bmiCat(bmi)})
+
+Produza uma avaliação completa e bem estruturada. Use exatamente estes títulos de seção:
+
+## 1. COMPOSIÇÃO CORPORAL
+
+Estime visualmente com base na imagem e nos dados fornecidos:
+- % de gordura corporal estimada (ex: "entre 18–22%") — seja honesto quanto à incerteza visual
+- Classificação morfológica (ectomorfo / mesomorfo / endomorfo / misto) com breve justificativa
+- Regiões com maior acúmulo de gordura visível (se aplicável)
+- Aparência da massa muscular: baixa / moderada / boa — quais grupos musculares se destacam visualmente
+
+## 2. ANÁLISE POSTURAL
+
+Avalie cada ponto com base no que é visível:
+- **Cabeça e pescoço**: centralizado, anteriorizado, inclinado lateralmente?
+- **Ombros**: nivelados ou desnivelados (qual lado mais alto)?
+- **Coluna**: lordose lombar (normal / aumentada / reduzida), cifose torácica, sinais de desvio lateral (escoliose)?
+- **Pelve**: aparente anteversão, retroversão ou desnivelamento lateral?
+- **Joelhos**: alinhados, valgo (joelhos para dentro), varo (joelhos para fora), hiperextensão?
+
+## 3. ASSIMETRIAS E DESEQUILÍBRIOS
+
+- Diferenças visuais entre lado esquerdo e direito (braços, ombros, pernas, quadril, trapézio)
+- Possíveis compensações musculares visíveis
+- Se algum membro parece visivelmente mais desenvolvido que o oposto
+
+## 4. RECOMENDAÇÕES PRIORITÁRIAS
+
+Com base nos achados acima, indique especificamente:
+- Top 3 exercícios ou práticas para correção das alterações encontradas (com nome e breve instrução)
+- Grupos musculares a FORTALECER vs. ALONGAR prioritariamente
+- Se recomenda consulta com fisioterapeuta, ortopedista ou personal trainer especializado
+
+Seja específico e direto. Se a postura for boa em algum ponto, afirme isso. Não invente problemas que não são visíveis na imagem.`;
+
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-opus-4-6',
+      max_tokens:2048,
+      system,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+        {type:'text',text:prompt}
+      ]}]
+    })
+  });
+
+  if(!res.ok){
+    const err=await res.json().catch(()=>({error:{message:'Erro desconhecido'}}));
+    throw new Error(err.error?.message||'Erro HTTP '+res.status);
+  }
+
+  const data=await res.json();
+  return data.content[0].text;
+}
+
+// ── RENDER RESULTS ──
+function showResults(text){
+  document.getElementById('loadingState').style.display='none';
+  const card=document.getElementById('resultsCard');
+
+  // Parse markdown-like headings and formatting
+  let html=text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^## .+?COMPOSIÇÃO CORPORAL.*$/gm,'<h3>🔬 Composição Corporal</h3>')
+    .replace(/^## .+?POSTURAL.*$/gm,'<h3>📐 Análise Postural</h3>')
+    .replace(/^## .+?ASSIMETRIAS.*$/gm,'<h3>⚖️ Assimetrias e Desequilíbrios</h3>')
+    .replace(/^## .+?RECOMENDAÇÕES.*$/gm,'<h3>🎯 Recomendações Prioritárias</h3>')
+    .replace(/^## (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, m => '<ul>'+m+'</ul>')
+    .replace(/\n{2,}/g,'\n')
+    .replace(/\n/g,'<br>');
+
+  card.innerHTML=html;
+  document.getElementById('resultsOut').style.display='block';
+}
+
+function showError(msg){
+  document.getElementById('loadingState').style.display='none';
+  document.getElementById('resultsCard').innerHTML=
+    `<div class="err-box"><strong>Erro na análise</strong><br><br>${escHtml(msg)}<br><br><small style="opacity:.7">Verifique sua chave de API e conexão com a internet.</small></div>`;
+  document.getElementById('resultsOut').style.display='block';
+}
+
+function backToMain(){
+  showScreen('mainScreen');
+  if(!stream)initCamera();
+}
+
+// ── UTILS ──
+function bmiCat(bmi){
+  const b=parseFloat(bmi);
+  if(b<18.5)return'abaixo do peso';
+  if(b<25)return'peso normal';
+  if(b<30)return'sobrepeso';
+  if(b<35)return'obesidade grau I';
+  return'obesidade grau II+';
+}
+function escHtml(t){
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+</script>
+</body>
+</html>
