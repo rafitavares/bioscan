@@ -3,243 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>BioScan — Avaliação Física por IA</title>
+<title>BioScan</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0B0F1A;--card:#131929;--card2:#1A2035;
-  --cyan:#00D4FF;--cdim:rgba(0,212,255,.12);
-  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--purple:#7C3AED;
-  --text:#F0F4FF;--muted:#7A8BA8;--border:rgba(0,212,255,.15);
-}
+:root{--bg:#0B0F1A;--card:#131929;--card2:#1A2035;--cyan:#00D4FF;--cdim:rgba(0,212,255,.12);--green:#10B981;--amber:#F59E0B;--red:#EF4444;--purple:#7C3AED;--text:#F0F4FF;--muted:#7A8BA8;--border:rgba(0,212,255,.15)}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
 .scr{display:none;position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .scr.on{display:block}
-
-/* CONFIG */
-.cfg-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem}
-.logo{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--cyan);letter-spacing:-.03em}
-.logo span{color:var(--text)}
-.sub{color:var(--muted);font-size:.85rem;margin:.375rem 0 2.5rem;text-align:center;line-height:1.6}
-.crd{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;width:100%;max-width:420px}
-.crd h2{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:.375rem}
-.crd p{color:var(--muted);font-size:.82rem;margin-bottom:1.375rem;line-height:1.65}
-.lbl{display:block;font-size:.73rem;color:var(--muted);margin-bottom:.4rem;letter-spacing:.04em;text-transform:uppercase}
-input[type=text],input[type=password],input[type=number]{
-  width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
-  padding:.7rem .9rem;color:var(--text);font-family:'JetBrains Mono',monospace;
-  font-size:.85rem;outline:none;transition:border-color .2s;-webkit-appearance:none
-}
+input[type=text],input[type=password],input[type=number]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none;transition:border-color .2s;-webkit-appearance:none}
 input:focus{border-color:var(--cyan)}
-.btn{
-  width:100%;padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;
-  border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:1rem;
-  font-weight:700;cursor:pointer;margin-top:1.25rem;transition:opacity .2s,transform .1s;letter-spacing:.02em
-}
-.btn:hover{opacity:.9}.btn:active{transform:scale(.98)}
+.btn{width:100%;padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s}
+.btn:active{transform:scale(.98)}.btn:hover{opacity:.9}
 .btn.ghost{background:transparent;color:var(--cyan);border:1px solid rgba(0,212,255,.35)}
 .btn.ghost:hover{background:var(--cdim)}
-.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;padding:.75rem .9rem;font-size:.78rem;color:var(--amber);margin-top:.875rem;line-height:1.55}
+.btn.danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.lbl{display:block;font-size:.73rem;color:var(--muted);margin-bottom:.4rem;letter-spacing:.04em;text-transform:uppercase}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:var(--cyan);letter-spacing:-.03em}
+.logo span,.logo-sm span{color:var(--text)}
+.logo-sm{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--cyan)}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.35rem .7rem;font-size:.78rem;cursor:pointer}
+.btn-sm:hover{border-color:var(--cyan);color:var(--cyan)}
+.sec-title{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;color:var(--cyan);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.crd{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;width:100%;max-width:420px}
+
+/* PROFILES */
+.prof-wrap{min-height:100%;padding:2rem 1.25rem;display:flex;flex-direction:column}
+.prof-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem}
+.prof-sub{color:var(--muted);font-size:.82rem;margin-top:.25rem}
+.prof-list{display:flex;flex-direction:column;gap:.75rem;flex:1}
+.prof-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1rem 1.1rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:border-color .2s,background .2s}
+.prof-card:hover{border-color:var(--cyan);background:var(--card2)}
+.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;flex-shrink:0}
+.prof-info{flex:1}
+.prof-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600}
+.prof-meta{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.prof-arrow{color:var(--muted);font-size:1.1rem}
+.new-prof-btn{margin-top:1.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem;background:var(--card);border:1px dashed rgba(0,212,255,.3);border-radius:14px;padding:1rem;cursor:pointer;color:var(--cyan);font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;transition:background .2s}
+.new-prof-btn:hover{background:var(--card2)}
+
+/* NEW PROFILE */
+.np-wrap{min-height:100%;padding:2rem 1.25rem;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sex-toggle{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.sex-btn{padding:.875rem;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--muted);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600;text-align:center;transition:all .2s}
+.sex-btn.sel{background:var(--cdim);border-color:var(--cyan);color:var(--cyan)}
 
 /* SETUP */
-.setup-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem}
-.setup-title{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:.375rem;text-align:center}
-.setup-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem;text-align:center;line-height:1.6}
-.measures{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;width:100%;max-width:380px;margin-bottom:1.25rem}
+.setup-wrap{min-height:100%;padding:2rem 1.25rem;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.active-prof-card{display:flex;align-items:center;gap:.875rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.875rem 1rem;width:100%;max-width:420px;margin-bottom:1.5rem;cursor:pointer}
+.active-prof-card .ap-change{font-size:.75rem;color:var(--cyan);margin-left:auto}
+.measures{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;width:100%;max-width:420px;margin-bottom:.75rem}
 .mi{font-size:1.3rem!important;font-family:'Space Grotesk',sans-serif!important;font-weight:700!important;text-align:center;padding:.6rem!important}
-.scan-steps-preview{display:flex;gap:1rem;margin:1.5rem 0 2rem;width:100%;max-width:380px}
-.step-prev{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.875rem .5rem;text-align:center}
-.step-prev .sp-icon{font-size:1.75rem;margin-bottom:.375rem}
-.step-prev .sp-label{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em}
+.step-prev-row{display:flex;gap:.625rem;width:100%;max-width:420px;margin-bottom:1.5rem}
+.step-prev{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.75rem .375rem;text-align:center}
+.sp-icon{font-size:1.5rem;margin-bottom:.25rem}
+.sp-lbl{font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em}
+.btn-row{display:flex;flex-direction:column;gap:.625rem;width:100%;max-width:420px}
 
 /* SCAN */
 .scan-scr{display:flex;flex-direction:column;height:100%}
-.scan-hdr{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;flex-shrink:0;background:var(--bg);z-index:10}
-.scan-hdr .logo-sm{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--cyan)}
-.scan-hdr .logo-sm span{color:var(--text)}
-.btn-sm{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.35rem .7rem;font-size:.78rem;cursor:pointer;font-family:'Inter',sans-serif}
-
-.progress-bar{display:flex;gap:.5rem;padding:.5rem 1.25rem;flex-shrink:0;background:var(--bg)}
+.scan-hdr{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;flex-shrink:0}
+.prog-bar{display:flex;gap:.5rem;padding:.375rem 1.25rem;flex-shrink:0}
 .prog-dot{flex:1;height:3px;background:var(--card2);border-radius:99px;transition:background .4s}
-.prog-dot.done{background:var(--green)}
-.prog-dot.active{background:var(--cyan)}
-
-.step-guide{
-  display:flex;align-items:center;gap:.875rem;
-  padding:.75rem 1.25rem;background:var(--card);flex-shrink:0;
-  border-bottom:1px solid var(--border)
-}
+.prog-dot.done{background:var(--green)}.prog-dot.active{background:var(--cyan)}
+.step-guide{display:flex;align-items:center;gap:.875rem;padding:.75rem 1.25rem;background:var(--card);flex-shrink:0;border-bottom:1px solid var(--border)}
 .step-icon{font-size:2rem;flex-shrink:0}
-.step-text{}
 .step-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--cyan);letter-spacing:.05em;margin-bottom:.2rem}
-.step-instr{font-size:.83rem;color:var(--text);line-height:1.4}
-
+.step-instr{font-size:.82rem;color:var(--text);line-height:1.4}
 .cam-container{position:relative;flex:1;background:#000;overflow:hidden;min-height:0}
 #video{width:100%;height:100%;object-fit:cover;display:block}
 .cam-overlay{position:absolute;inset:0;pointer-events:none}
 .scan-grid{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(0,212,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.06) 1px,transparent 1px);background-size:44px 44px;transition:opacity .5s}
 .scan-grid.on{opacity:1}
 .scan-beam{position:absolute;left:0;right:0;height:3px;background:var(--cyan);box-shadow:0 0 16px var(--cyan),0 0 32px rgba(0,212,255,.4);opacity:0}
-.scan-beam.on{opacity:1;animation:beam 2.4s ease-in-out infinite}
+.scan-beam.on{opacity:1;animation:beam 2.2s ease-in-out infinite}
 @keyframes beam{0%{top:0}50%{top:97%}100%{top:0}}
 .corners{position:absolute;inset:0}
 .c{position:absolute;width:22px;height:22px;border-color:var(--cyan);border-style:solid;opacity:.8}
-.c-tl{top:12px;left:12px;border-width:2px 0 0 2px}
-.c-tr{top:12px;right:12px;border-width:2px 2px 0 0}
-.c-bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
-.c-br{bottom:12px;right:12px;border-width:0 2px 2px 0}
+.c-tl{top:12px;left:12px;border-width:2px 0 0 2px}.c-tr{top:12px;right:12px;border-width:2px 2px 0 0}
+.c-bl{bottom:12px;left:12px;border-width:0 0 2px 2px}.c-br{bottom:12px;right:12px;border-width:0 2px 2px 0}
 .cd-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,15,26,.65);opacity:0;transition:opacity .3s}
 .cd-overlay.on{opacity:1}
 .cd-num{font-family:'Space Grotesk',sans-serif;font-size:8rem;font-weight:700;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.6);animation:cdp 1s ease-out}
 @keyframes cdp{0%{transform:scale(1.5);opacity:0}100%{transform:scale(1);opacity:1}}
-
 .scan-footer{padding:.875rem 1.25rem;background:var(--bg);flex-shrink:0;display:flex;flex-direction:column;gap:.625rem}
 .status-row{display:flex;align-items:center;justify-content:space-between}
 .stxt{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
-.sdot.ready{background:var(--green);animation:dp 2s infinite}
-.sdot.scanning{background:var(--cyan);animation:dp .5s infinite}
+.sdot.ready{background:var(--green);animation:dp 2s infinite}.sdot.scanning{background:var(--cyan);animation:dp .5s infinite}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:.2}}
-
 .thumbs-row{display:flex;gap:.5rem;height:54px}
-.thumb-slot{
-  flex:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);
-  background:var(--card);display:flex;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);position:relative
-}
+.thumb-slot{flex:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);position:relative}
 .thumb-slot img{width:100%;height:100%;object-fit:cover;display:none}
-.thumb-slot.captured img{display:block}
-.thumb-slot.captured .slot-lbl{display:none}
+.thumb-slot.captured img{display:block}.thumb-slot.captured .slot-lbl{display:none}
 .thumb-slot.active{border-color:var(--cyan)}
-
-.btn-capture{
-  padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;border-radius:12px;
-  font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;
-  transition:opacity .2s,transform .1s;letter-spacing:.03em
-}
-.btn-capture:disabled{opacity:.35;cursor:not-allowed}
-.btn-capture:not(:disabled):active{transform:scale(.98)}
+.btn-capture{padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;border-radius:12px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s}
+.btn-capture:disabled{opacity:.35;cursor:not-allowed}.btn-capture:not(:disabled):active{transform:scale(.98)}
+.btn-flip-cam{width:52px;height:52px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:var(--cyan);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;transition:background .2s,border-color .2s}
+.btn-flip-cam:hover{background:var(--card2);border-color:var(--cyan)}
+.capture-row{display:flex;gap:.625rem;align-items:center}
 
 /* PROCESSING */
 .proc-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem;text-align:center}
 .proc-thumbs{display:flex;gap:.75rem;margin-bottom:2rem}
-.proc-thumb{width:90px;height:120px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--card)}
+.proc-thumb{width:85px;height:113px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--card)}
 .proc-thumb img{width:100%;height:100%;object-fit:cover}
 .spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.25rem}
 @keyframes spin{to{transform:rotate(360deg)}}
-.proc-lbl{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--cyan);margin-bottom:.4rem}
-.proc-sub{font-size:.78rem;color:var(--muted);margin-bottom:1.5rem}
 .pstep{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);padding:.2rem 0;opacity:0;transition:opacity .4s,color .3s;text-align:left}
-.pstep.on{opacity:1;color:var(--cyan)}
-.pstep.done{opacity:.6;color:var(--green)}
+.pstep.on{opacity:1;color:var(--cyan)}.pstep.done{opacity:.6;color:var(--green)}
 
 /* RESULTS */
-.res-scr{padding-bottom:3rem}
 .res-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:20}
-.res-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600}
-
-/* Score hero */
 .score-hero{padding:1.5rem 1.25rem 1rem;text-align:center;border-bottom:1px solid var(--border)}
 .score-ring{display:flex;justify-content:center;margin-bottom:.75rem}
 .score-ring svg{width:130px;height:130px}
-.score-val{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;fill:var(--text)}
-.score-unit{font-size:.75rem;fill:var(--muted);font-family:'Inter',sans-serif}
-.score-label{font-size:.85rem;color:var(--muted);margin-bottom:.25rem}
+.score-lbl{font-size:.85rem;color:var(--muted);margin-bottom:.25rem}
 .score-badge{display:inline-block;padding:.3rem .875rem;border-radius:99px;font-size:.8rem;font-weight:600;font-family:'Space Grotesk',sans-serif}
-.badge-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
-.badge-amber{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
-.badge-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
-
-/* Stats row */
+.bg{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.ba{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.br{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
 .stat-card{background:var(--card);border-radius:12px;padding:.875rem .625rem;text-align:center}
 .stat-val{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700;color:var(--cyan);line-height:1}
-.stat-lbl{font-size:.68rem;color:var(--muted);margin-top:.3rem;letter-spacing:.03em}
-
-/* Composição */
+.stat-lbl{font-size:.65rem;color:var(--muted);margin-top:.3rem;letter-spacing:.03em}
 .section{padding:1.25rem}
-.sec-title{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;color:var(--cyan);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
 .bar-item{margin-bottom:1rem}
 .bar-hdr{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.4rem}
-.bar-lbl{color:var(--muted)}
-.bar-val{font-family:'JetBrains Mono',monospace;color:var(--text);font-size:.78rem}
+.bar-lbl{color:var(--muted)}.bar-val{font-family:'JetBrains Mono',monospace;color:var(--text);font-size:.78rem}
 .bar-track{height:8px;background:var(--card2);border-radius:99px;overflow:hidden}
 .bar-fill{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.morpho-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.625rem 1rem;font-size:.85rem;margin-top:.5rem}
-.morpho-badge strong{font-family:'Space Grotesk',sans-serif;color:var(--cyan)}
-
-/* Postura body map */
 .body-map-wrap{display:flex;gap:1rem;justify-content:center;margin-bottom:1.25rem}
 .body-map-col{text-align:center}
-.body-map-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.375rem;letter-spacing:.04em}
 .body-map-col svg{width:80px;height:180px}
+.bml{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.375rem;letter-spacing:.04em}
 .posture-legend{display:flex;gap:1rem;justify-content:center;margin-bottom:1.25rem}
 .leg-item{display:flex;align-items:center;gap:.375rem;font-size:.73rem;color:var(--muted)}
 .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-
 .posture-cards{display:flex;flex-direction:column;gap:.625rem}
 .posture-card{background:var(--card);border-radius:12px;padding:.875rem 1rem;display:flex;align-items:center;gap:.875rem;border-left:3px solid transparent}
-.posture-card.bom{border-color:var(--green)}
-.posture-card.atencao{border-color:var(--amber)}
-.posture-card.corrigir{border-color:var(--red)}
-.pc-icon{font-size:1.25rem;flex-shrink:0}
-.pc-body{flex:1}
-.pc-name{font-size:.82rem;font-weight:500;margin-bottom:.2rem}
-.pc-note{font-size:.75rem;color:var(--muted);line-height:1.4}
+.posture-card.bom{border-color:var(--green)}.posture-card.atencao{border-color:var(--amber)}.posture-card.corrigir{border-color:var(--red)}
+.pc-icon{font-size:1.25rem;flex-shrink:0}.pc-body{flex:1}
+.pc-name{font-size:.82rem;font-weight:500;margin-bottom:.2rem}.pc-note{font-size:.75rem;color:var(--muted);line-height:1.4}
 .pc-score{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;flex-shrink:0}
-.pc-score.bom{color:var(--green)}
-.pc-score.atencao{color:var(--amber)}
-.pc-score.corrigir{color:var(--red)}
-
-/* Photo tabs */
-.photo-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 1.25rem;gap:0}
+.pc-score.bom{color:var(--green)}.pc-score.atencao{color:var(--amber)}.pc-score.corrigir{color:var(--red)}
+.photo-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 1.25rem}
 .ptab{flex:1;padding:.625rem;text-align:center;font-size:.8rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;font-family:'Space Grotesk',sans-serif;font-weight:500}
 .ptab.active{color:var(--cyan);border-color:var(--cyan)}
-.photo-panel{display:none;padding:1.25rem}
-.photo-panel.active{display:block}
-.annotated-photo{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
-.annotated-photo canvas{width:100%;display:block}
-.no-ann{padding:2rem;text-align:center;color:var(--muted);font-size:.82rem;background:var(--card);border-radius:12px}
-
-/* Recommendations */
+.photo-panel{display:none;padding:1.25rem}.photo-panel.active{display:block}
+.ann-photo{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
+.ann-photo canvas{width:100%;display:block}
 .rec-card{background:var(--card);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.75rem;border:1px solid var(--border)}
 .rec-hdr{display:flex;align-items:center;gap:.625rem;margin-bottom:.5rem}
 .rec-prio{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:.75rem;font-weight:700;flex-shrink:0}
 .p1{background:rgba(239,68,68,.15);color:var(--red)}.p2{background:rgba(245,158,11,.12);color:var(--amber)}.p3{background:rgba(16,185,129,.12);color:var(--green)}
-.rec-area{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600}
-.rec-type{margin-left:auto;font-size:.7rem;padding:.2rem .6rem;border-radius:99px;background:var(--card2);color:var(--muted)}
+.rec-area{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600}.rec-type{margin-left:auto;font-size:.7rem;padding:.2rem .6rem;border-radius:99px;background:var(--card2);color:var(--muted)}
 .rec-exercise{font-size:.85rem;font-weight:500;margin-bottom:.3rem;color:var(--cyan)}
 .rec-instr{font-size:.78rem;color:var(--muted);line-height:1.55}
-
 .asym-list{background:var(--card);border-radius:12px;padding:.875rem 1rem}
 .asym-item{font-size:.82rem;color:var(--text);padding:.375rem 0;border-bottom:1px solid var(--border);display:flex;gap:.5rem;line-height:1.4}
-.asym-item:last-child{border-bottom:none}
-.asym-item::before{content:'⚖️';flex-shrink:0}
-
+.asym-item:last-child{border-bottom:none}.asym-item::before{content:'⚖️';flex-shrink:0}
 .resumo-box{background:rgba(0,212,255,.06);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;font-size:.83rem;line-height:1.7;color:var(--text);margin-bottom:1.25rem}
-
+.saved-pill{display:inline-flex;align-items:center;gap:.375rem;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25);border-radius:99px;padding:.3rem .75rem;font-size:.75rem;font-family:'Space Grotesk',sans-serif}
+.disc{background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);border-radius:10px;padding:.875rem 1rem;font-size:.78rem;color:#A78BFA;line-height:1.6}
+.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;padding:.75rem .9rem;font-size:.78rem;color:var(--amber);margin-top:.875rem;line-height:1.55}
 .err-box{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.28);border-radius:12px;padding:1.25rem;color:#FCA5A5;font-size:.87rem;line-height:1.7}
 
-canvas{display:none}
-#mainCanvas{display:none}
+/* HISTORY */
+.hist-hdr{display:flex;align-items:center;gap:.875rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:20}
+.hist-prof-info{flex:1}.hist-prof-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600}
+.hist-prof-meta{font-size:.75rem;color:var(--muted)}
+.progress-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.prog-card{background:var(--card);border-radius:12px;padding:.75rem .5rem;text-align:center}
+.prog-val{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;line-height:1}
+.prog-lbl{font-size:.65rem;color:var(--muted);margin-top:.25rem;letter-spacing:.02em}
+.prog-trend{font-size:.8rem;margin-right:.2rem}
+.chart-wrap{background:var(--card);border-radius:12px;padding:1rem 1rem .5rem;margin-bottom:.875rem;overflow:hidden}
+.chart-title{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.04em;margin-bottom:.625rem}
+.chart-empty{font-size:.78rem;color:var(--muted);text-align:center;padding:1.5rem 0}
+.scan-hist-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:.875rem;margin-bottom:.75rem}
+.scan-hist-thumb{width:52px;height:70px;border-radius:8px;overflow:hidden;background:var(--card2);flex-shrink:0}
+.scan-hist-thumb img{width:100%;height:100%;object-fit:cover}
+.scan-hist-body{flex:1}
+.scan-hist-date{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:.375rem}
+.scan-hist-stats{display:flex;gap:.625rem;flex-wrap:wrap}
+.hist-stat{font-size:.75rem;background:var(--card2);padding:.25rem .5rem;border-radius:6px}
+.hist-stat strong{font-family:'Space Grotesk',sans-serif;color:var(--cyan)}
+.scan-hist-score{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;line-height:1;align-self:center}
+.no-scans{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.85rem;line-height:1.7}
+
+/* CONFIG */
+.cfg-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem}
+
+canvas,#mainCanvas{display:none}
 </style>
 </head>
 <body>
 
-<!-- CONFIG -->
-<div id="scrConfig" class="scr on">
-  <div class="cfg-wrap">
-    <div class="logo">Bio<span>Scan</span></div>
-    <p class="sub">Avaliação física e postural por IA<br>Frente · Lado · Costas</p>
-    <div class="crd">
-      <h2>Chave de API (Claude)</h2>
-      <p>Crie sua chave gratuitamente em <strong>console.anthropic.com</strong> → Settings → API Keys</p>
-      <label class="lbl">Chave de API</label>
-      <input type="password" id="apiKey" placeholder="sk-ant-api03-…" autocomplete="off"/>
-      <button class="btn" onclick="saveKey()">Salvar e Continuar →</button>
-      <div class="warn">⚠ A chave é salva apenas neste dispositivo. Configure um limite de gasto na conta Anthropic para segurança.</div>
+<!-- PROFILES -->
+<div id="scrProfiles" class="scr on">
+  <div class="prof-wrap">
+    <div class="prof-hdr">
+      <div><div class="logo">Bio<span>Scan</span></div><div class="prof-sub">Selecione seu perfil</div></div>
+      <button class="btn-sm" onclick="showCfg()">⚙ API</button>
+    </div>
+    <div class="prof-list" id="profList"></div>
+    <div class="new-prof-btn" onclick="showNewProf(null)">+ Novo Perfil</div>
+  </div>
+</div>
+
+<!-- NEW PROFILE -->
+<div id="scrNewProf" class="scr">
+  <div class="np-wrap">
+    <div class="crd" style="max-width:420px;width:100%">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600" id="npTitle">Novo Perfil</h2>
+        <button class="btn-sm" onclick="show('scrProfiles')">← Voltar</button>
+      </div>
+      <label class="lbl">Nome</label>
+      <input type="text" id="npName" placeholder="Ex: Rafael" style="margin-bottom:1rem"/>
+      <label class="lbl">Sexo</label>
+      <div class="sex-toggle" style="margin-bottom:1rem">
+        <div class="sex-btn sel" id="sexM" onclick="selSex('M')">♂ Masculino</div>
+        <div class="sex-btn" id="sexF" onclick="selSex('F')">♀ Feminino</div>
+      </div>
+      <label class="lbl">Ano de Nascimento (opcional)</label>
+      <input type="number" id="npYear" placeholder="1990" min="1930" max="2015" inputmode="numeric" style="margin-bottom:1.25rem"/>
+      <button class="btn" id="npSaveBtn" onclick="saveProfile()">Salvar Perfil</button>
+      <button class="btn danger" id="npDeleteBtn" onclick="deleteProfile()" style="margin-top:.625rem;display:none">Excluir Perfil</button>
     </div>
   </div>
 </div>
@@ -247,26 +239,24 @@ canvas{display:none}
 <!-- SETUP -->
 <div id="scrSetup" class="scr">
   <div class="setup-wrap">
-    <div class="logo">Bio<span>Scan</span></div>
-    <p class="sub">Insira suas medidas e inicie o scan de 3 ângulos</p>
+    <div class="active-prof-card" id="activeProfCard" onclick="show('scrProfiles')">
+      <div class="avatar" id="setupAvatar" style="width:40px;height:40px;font-size:.95rem"></div>
+      <div style="flex:1"><div id="setupProfName" style="font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600"></div><div style="font-size:.72rem;color:var(--muted)">Toque para trocar perfil</div></div>
+      <div class="ap-change">Trocar →</div>
+    </div>
     <div class="measures">
-      <div>
-        <label class="lbl">Peso (kg)</label>
-        <input type="number" id="weight" class="mi" placeholder="75" min="30" max="300" inputmode="decimal"/>
-      </div>
-      <div>
-        <label class="lbl">Altura (cm)</label>
-        <input type="number" id="height" class="mi" placeholder="170" min="100" max="230" inputmode="decimal"/>
-      </div>
+      <div><label class="lbl">Peso (kg)</label><input type="number" id="weight" class="mi" placeholder="75" min="30" max="300" inputmode="decimal"/></div>
+      <div><label class="lbl">Altura (cm)</label><input type="number" id="height" class="mi" placeholder="170" min="100" max="230" inputmode="decimal"/></div>
     </div>
-    <div class="scan-steps-preview">
-      <div class="step-prev"><div class="sp-icon">🧍</div><div class="sp-label">FRENTE</div></div>
-      <div class="step-prev"><div class="sp-icon">🚶</div><div class="sp-label">LADO DIR.</div></div>
-      <div class="step-prev"><div class="sp-icon">🔄</div><div class="sp-label">COSTAS</div></div>
+    <div class="step-prev-row">
+      <div class="step-prev"><div class="sp-icon">🧍</div><div class="sp-lbl">FRENTE</div></div>
+      <div class="step-prev"><div class="sp-icon">🚶</div><div class="sp-lbl">LADO DIR.</div></div>
+      <div class="step-prev"><div class="sp-icon">🔄</div><div class="sp-lbl">COSTAS</div></div>
     </div>
-    <div style="width:100%;max-width:380px">
+    <div class="btn-row">
       <button class="btn" onclick="startScan()">Iniciar Scan de 3 Ângulos →</button>
-      <button class="btn ghost" onclick="showCfg()" style="margin-top:.625rem">⚙ Trocar API</button>
+      <button class="btn ghost" onclick="showHistory()">📊 Ver Histórico</button>
+      <button class="btn ghost" onclick="showNewProf(getActiveProfile())" style="font-size:.85rem">✏️ Editar Perfil</button>
     </div>
   </div>
 </div>
@@ -274,23 +264,13 @@ canvas{display:none}
 <!-- SCAN -->
 <div id="scrScan" class="scr">
   <div class="scan-scr" style="height:100%;display:flex;flex-direction:column">
-    <div class="scan-hdr">
-      <div class="logo-sm">Bio<span>Scan</span></div>
-      <button class="btn-sm" onclick="cancelScan()">✕ Cancelar</button>
-    </div>
-    <div class="progress-bar">
-      <div class="prog-dot active" id="pd0"></div>
-      <div class="prog-dot" id="pd1"></div>
-      <div class="prog-dot" id="pd2"></div>
-    </div>
+    <div class="scan-hdr"><div class="logo-sm">Bio<span>Scan</span></div><button class="btn-sm" onclick="cancelScan()">✕ Cancelar</button></div>
+    <div class="prog-bar"><div class="prog-dot active" id="pd0"></div><div class="prog-dot" id="pd1"></div><div class="prog-dot" id="pd2"></div></div>
     <div class="step-guide">
       <div class="step-icon" id="stepIcon">🧍</div>
-      <div class="step-text">
-        <div class="step-num" id="stepNum">PASSO 1 DE 3</div>
-        <div class="step-instr" id="stepInstr">Fique de frente, braços relaxados ao lado do corpo, pés afastados na largura dos ombros</div>
-      </div>
+      <div><div class="step-num" id="stepNum">PASSO 1 DE 3</div><div class="step-instr" id="stepInstr">Fique de frente, braços relaxados, pés na largura dos ombros</div></div>
     </div>
-    <div class="cam-container" id="camContainer">
+    <div class="cam-container">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="mainCanvas"></canvas>
       <div class="cam-overlay">
@@ -301,16 +281,16 @@ canvas{display:none}
       </div>
     </div>
     <div class="scan-footer">
-      <div class="status-row">
-        <span class="stxt" id="stxt">câmera iniciando…</span>
-        <div class="sdot" id="sdot"></div>
-      </div>
+      <div class="status-row"><span class="stxt" id="stxt">câmera iniciando…</span><div class="sdot" id="sdot"></div></div>
       <div class="thumbs-row">
-        <div class="thumb-slot" id="ts0"><span class="slot-lbl">FRENTE</span><img id="th0" alt=""/></div>
-        <div class="thumb-slot" id="ts1"><span class="slot-lbl">LADO</span><img id="th1" alt=""/></div>
-        <div class="thumb-slot" id="ts2"><span class="slot-lbl">COSTAS</span><img id="th2" alt=""/></div>
+        <div class="thumb-slot active" id="ts0"><span class="slot-lbl" style="font-size:.6rem">FRENTE</span><img id="th0" alt=""/></div>
+        <div class="thumb-slot" id="ts1"><span class="slot-lbl" style="font-size:.6rem">LADO</span><img id="th1" alt=""/></div>
+        <div class="thumb-slot" id="ts2"><span class="slot-lbl" style="font-size:.6rem">COSTAS</span><img id="th2" alt=""/></div>
       </div>
-      <button class="btn-capture btn" id="btnCapture" onclick="doCapture()" disabled>📸 Capturar</button>
+      <div class="capture-row">
+        <button class="btn-capture btn" id="btnCapture" onclick="doCapture()" disabled style="flex:1">📸 Capturar</button>
+        <button class="btn-flip-cam" id="btnFlipCam" onclick="flipCam()" title="Trocar câmera">🔄</button>
+      </div>
     </div>
   </div>
 </div>
@@ -319,126 +299,92 @@ canvas{display:none}
 <div id="scrProc" class="scr">
   <div class="proc-wrap">
     <div class="proc-thumbs">
-      <div class="proc-thumb"><img id="pt0" alt="Frente"/></div>
-      <div class="proc-thumb"><img id="pt1" alt="Lado"/></div>
-      <div class="proc-thumb"><img id="pt2" alt="Costas"/></div>
+      <div class="proc-thumb"><img id="pt0" alt=""/></div>
+      <div class="proc-thumb"><img id="pt1" alt=""/></div>
+      <div class="proc-thumb"><img id="pt2" alt=""/></div>
     </div>
     <div class="spinner"></div>
-    <div class="proc-lbl">Analisando com Claude AI…</div>
-    <div class="proc-sub">Avaliando composição, postura e assimetrias</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--cyan);margin-bottom:.4rem">Analisando com Claude AI…</div>
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:1.5rem">Processando 3 ângulos</div>
     <div>
       <div class="pstep on" id="ps1">▸ Processando as 3 imagens…</div>
       <div class="pstep" id="ps2">▸ Estimando composição corporal…</div>
       <div class="pstep" id="ps3">▸ Mapeando alinhamento postural…</div>
       <div class="pstep" id="ps4">▸ Detectando assimetrias…</div>
-      <div class="pstep" id="ps5">▸ Gerando recomendações…</div>
+      <div class="pstep" id="ps5">▸ Gerando recomendações personalizadas…</div>
     </div>
   </div>
 </div>
 
 <!-- RESULTS -->
-<div id="scrResults" class="scr res-scr">
+<div id="scrResults" class="scr">
   <div class="res-hdr">
-    <span class="res-title">Relatório BioScan</span>
-    <button class="btn-sm" onclick="showSetup()">← Novo Scan</button>
+    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600">Relatório BioScan</div><div id="resSavedPill"></div></div>
+    <button class="btn-sm" onclick="showSetupFromResults()">← Novo</button>
   </div>
-
-  <!-- Score -->
   <div class="score-hero">
     <div class="score-ring">
       <svg viewBox="0 0 130 130">
         <circle cx="65" cy="65" r="54" fill="none" stroke="#1A2035" stroke-width="10"/>
-        <circle id="scoreArc" cx="65" cy="65" r="54" fill="none" stroke="#00D4FF" stroke-width="10"
-          stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"
-          transform="rotate(-90 65 65)" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
-        <text id="scoreVal" x="65" y="58" text-anchor="middle" dominant-baseline="central"
-          font-family="'Space Grotesk',sans-serif" font-size="28" font-weight="700" fill="#F0F4FF">—</text>
+        <circle id="scoreArc" cx="65" cy="65" r="54" fill="none" stroke="#00D4FF" stroke-width="10" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3" transform="rotate(-90 65 65)" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+        <text id="scoreVal" x="65" y="58" text-anchor="middle" font-family="'Space Grotesk',sans-serif" font-size="28" font-weight="700" fill="#F0F4FF">—</text>
         <text x="65" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#7A8BA8">/ 100</text>
       </svg>
     </div>
-    <div class="score-label">Pontuação Geral</div>
+    <div class="score-lbl">Pontuação Geral</div>
     <div id="scoreBadge"></div>
   </div>
-
-  <!-- Quick Stats -->
   <div class="stats-row">
-    <div class="stat-card"><div class="stat-val" id="statFat">—%</div><div class="stat-lbl">GORDURA EST.</div></div>
+    <div class="stat-card"><div class="stat-val" id="statFat">—</div><div class="stat-lbl">GORDURA EST.</div></div>
     <div class="stat-card"><div class="stat-val" id="statBmi">—</div><div class="stat-lbl">IMC</div></div>
     <div class="stat-card"><div class="stat-val" id="statMorpho">—</div><div class="stat-lbl">MORFOLOGIA</div></div>
   </div>
-
-  <!-- Resumo -->
-  <div class="section">
-    <div class="sec-title">💬 Resumo da Avaliação</div>
-    <div class="resumo-box" id="resumoBox">—</div>
-  </div>
-
-  <!-- Composição -->
+  <div class="section"><div class="sec-title">💬 Resumo</div><div class="resumo-box" id="resumoBox">—</div></div>
   <div class="section" style="border-top:1px solid var(--border)">
     <div class="sec-title">🔬 Composição Corporal</div>
-    <div class="bar-item">
-      <div class="bar-hdr"><span class="bar-lbl">% Gordura Corporal</span><span class="bar-val" id="fatVal">—</span></div>
-      <div class="bar-track"><div class="bar-fill" id="fatBar" style="background:var(--amber)"></div></div>
-    </div>
-    <div class="bar-item">
-      <div class="bar-hdr"><span class="bar-lbl">Massa Muscular Relativa</span><span class="bar-val" id="muscleVal">—</span></div>
-      <div class="bar-track"><div class="bar-fill" id="muscleBar" style="background:var(--cyan)"></div></div>
-    </div>
+    <div class="bar-item"><div class="bar-hdr"><span class="bar-lbl">% Gordura Corporal</span><span class="bar-val" id="fatVal">—</span></div><div class="bar-track"><div class="bar-fill" id="fatBar" style="background:var(--amber)"></div></div></div>
+    <div class="bar-item"><div class="bar-hdr"><span class="bar-lbl">Massa Muscular Relativa</span><span class="bar-val" id="muscleVal">—</span></div><div class="bar-track"><div class="bar-fill" id="muscleBar" style="background:var(--cyan)"></div></div></div>
     <div id="fatRegion" style="font-size:.8rem;color:var(--muted);margin-top:.5rem;line-height:1.5"></div>
   </div>
-
-  <!-- Postura -->
   <div class="section" style="border-top:1px solid var(--border)">
     <div class="sec-title">📐 Mapa Postural</div>
     <div class="body-map-wrap">
-      <div class="body-map-col">
-        <div class="body-map-lbl">FRENTE</div>
+      <div class="body-map-col"><div class="bml">FRENTE</div>
         <svg id="bodyFront" viewBox="0 0 80 180" xmlns="http://www.w3.org/2000/svg">
-          <!-- Silhouette -->
           <g fill="none" stroke="#2A3550" stroke-width="1.5">
-            <ellipse cx="40" cy="12" rx="11" ry="12"/><!-- head -->
-            <line x1="40" y1="24" x2="40" y2="30"/><!-- neck -->
-            <path d="M22,30 Q40,27 58,30 L62,80 Q40,84 18,80 Z"/><!-- torso -->
-            <path d="M22,32 L10,65 Q9,70 13,71 L18,70 L22,55"/><!-- left arm -->
-            <path d="M58,32 L70,65 Q71,70 67,71 L62,70 L58,55"/><!-- right arm -->
-            <path d="M28,80 L24,140 Q24,145 28,145 L34,145 L36,95"/><!-- left leg -->
-            <path d="M52,80 L56,140 Q56,145 52,145 L46,145 L44,95"/><!-- right leg -->
-            <path d="M24,140 Q24,148 28,150 L34,150 L35,145"/><!-- left foot -->
-            <path d="M56,140 Q56,148 52,150 L46,150 L45,145"/><!-- right foot -->
+            <ellipse cx="40" cy="12" rx="11" ry="12"/><line x1="40" y1="24" x2="40" y2="30"/>
+            <path d="M22,30 Q40,27 58,30 L62,80 Q40,84 18,80 Z"/>
+            <path d="M22,32 L10,65 Q9,70 13,71 L18,70 L22,55"/><path d="M58,32 L70,65 Q71,70 67,71 L62,70 L58,55"/>
+            <path d="M28,80 L24,140 Q24,145 28,145 L34,145 L36,95"/><path d="M52,80 L56,140 Q56,145 52,145 L46,145 L44,95"/>
+            <path d="M24,140 Q24,148 28,150 L34,150 L35,145"/><path d="M56,140 Q56,148 52,150 L46,150 L45,145"/>
           </g>
-          <!-- Posture markers - will be colored by JS -->
-          <circle id="fm-head" cx="40" cy="12" r="5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-lshoulder" cx="22" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-rshoulder" cx="58" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-spine-t" cx="40" cy="50" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-spine-l" cx="40" cy="72" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-pelvis" cx="40" cy="82" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-lknee" cx="30" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="fm-rknee" cx="50" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-head" cx="40" cy="12" r="5" fill="#2A3550"/>
+          <circle id="fm-lsh" cx="22" cy="31" r="4.5" fill="#2A3550"/>
+          <circle id="fm-rsh" cx="58" cy="31" r="4.5" fill="#2A3550"/>
+          <circle id="fm-spt" cx="40" cy="50" r="4" fill="#2A3550"/>
+          <circle id="fm-spl" cx="40" cy="72" r="4" fill="#2A3550"/>
+          <circle id="fm-pelv" cx="40" cy="82" r="4.5" fill="#2A3550"/>
+          <circle id="fm-lkn" cx="30" cy="118" r="4" fill="#2A3550"/>
+          <circle id="fm-rkn" cx="50" cy="118" r="4" fill="#2A3550"/>
         </svg>
       </div>
-      <div class="body-map-col">
-        <div class="body-map-lbl">COSTAS</div>
+      <div class="body-map-col"><div class="bml">COSTAS</div>
         <svg id="bodyBack" viewBox="0 0 80 180" xmlns="http://www.w3.org/2000/svg">
           <g fill="none" stroke="#2A3550" stroke-width="1.5">
-            <ellipse cx="40" cy="12" rx="11" ry="12"/>
-            <line x1="40" y1="24" x2="40" y2="30"/>
+            <ellipse cx="40" cy="12" rx="11" ry="12"/><line x1="40" y1="24" x2="40" y2="30"/>
             <path d="M22,30 Q40,27 58,30 L62,80 Q40,84 18,80 Z"/>
-            <path d="M22,32 L10,65 Q9,70 13,71 L18,70 L22,55"/>
-            <path d="M58,32 L70,65 Q71,70 67,71 L62,70 L58,55"/>
-            <path d="M28,80 L24,140 Q24,145 28,145 L34,145 L36,95"/>
-            <path d="M52,80 L56,140 Q56,145 52,145 L46,145 L44,95"/>
-            <path d="M24,140 Q24,148 28,150 L34,150 L35,145"/>
-            <path d="M56,140 Q56,148 52,150 L46,150 L45,145"/>
+            <path d="M22,32 L10,65 Q9,70 13,71 L18,70 L22,55"/><path d="M58,32 L70,65 Q71,70 67,71 L62,70 L58,55"/>
+            <path d="M28,80 L24,140 Q24,145 28,145 L34,145 L36,95"/><path d="M52,80 L56,140 Q56,145 52,145 L46,145 L44,95"/>
+            <path d="M24,140 Q24,148 28,150 L34,150 L35,145"/><path d="M56,140 Q56,148 52,150 L46,150 L45,145"/>
           </g>
-          <circle id="bm-head" cx="40" cy="12" r="5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-lshoulder" cx="22" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-rshoulder" cx="58" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-spine-t" cx="40" cy="50" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-spine-l" cx="40" cy="72" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-pelvis" cx="40" cy="82" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-lknee" cx="30" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
-          <circle id="bm-rknee" cx="50" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-head" cx="40" cy="12" r="5" fill="#2A3550"/>
+          <circle id="bm-lsh" cx="22" cy="31" r="4.5" fill="#2A3550"/>
+          <circle id="bm-rsh" cx="58" cy="31" r="4.5" fill="#2A3550"/>
+          <circle id="bm-spt" cx="40" cy="50" r="4" fill="#2A3550"/>
+          <circle id="bm-spl" cx="40" cy="72" r="4" fill="#2A3550"/>
+          <circle id="bm-pelv" cx="40" cy="82" r="4.5" fill="#2A3550"/>
+          <circle id="bm-lkn" cx="30" cy="118" r="4" fill="#2A3550"/>
+          <circle id="bm-rkn" cx="50" cy="118" r="4" fill="#2A3550"/>
         </svg>
       </div>
     </div>
@@ -449,187 +395,280 @@ canvas{display:none}
     </div>
     <div class="posture-cards" id="postureCards"></div>
   </div>
-
-  <!-- Photos annotated -->
   <div style="border-top:1px solid var(--border)">
-    <div class="section" style="padding-bottom:.75rem">
-      <div class="sec-title">📷 Fotos com Anotações</div>
-    </div>
-    <div class="photo-tabs">
-      <div class="ptab active" onclick="switchTab(0)">Frente</div>
-      <div class="ptab" onclick="switchTab(1)">Lado Direito</div>
-      <div class="ptab" onclick="switchTab(2)">Costas</div>
-    </div>
+    <div class="section" style="padding-bottom:.75rem"><div class="sec-title">📷 Fotos com Anotações</div></div>
+    <div class="photo-tabs"><div class="ptab active" onclick="switchTab(0)">Frente</div><div class="ptab" onclick="switchTab(1)">Lado Dir.</div><div class="ptab" onclick="switchTab(2)">Costas</div></div>
     <div class="photo-panel active" id="pp0"></div>
     <div class="photo-panel" id="pp1"></div>
     <div class="photo-panel" id="pp2"></div>
   </div>
-
-  <!-- Assimetrias -->
   <div class="section" style="border-top:1px solid var(--border)">
-    <div class="sec-title">⚖️ Assimetrias Detectadas</div>
+    <div class="sec-title">⚖️ Assimetrias</div>
     <div class="asym-list" id="asymList"></div>
   </div>
-
-  <!-- Recommendations -->
   <div class="section" style="border-top:1px solid var(--border)">
-    <div class="sec-title">🎯 Recomendações Prioritárias</div>
+    <div class="sec-title">🎯 Recomendações</div>
     <div id="recCards"></div>
   </div>
+  <div class="section">
+    <div class="disc">⚠ <strong>Aviso:</strong> Estimativa visual por IA com fins educativos. Não substitui avaliação de fisioterapeuta ou médico.</div>
+    <button class="btn ghost" onclick="showHistory()" style="margin-top:1rem">📊 Ver Histórico de Evolução</button>
+  </div>
+</div>
 
-  <div style="padding:0 1.25rem">
-    <div style="background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);border-radius:10px;padding:.875rem 1rem;font-size:.78rem;color:#A78BFA;line-height:1.6;margin-bottom:1.25rem">
-      ⚠ <strong>Aviso:</strong> Estimativa visual por IA com fins educativos. Não substitui avaliação de fisioterapeuta, médico ou educador físico.
+<!-- HISTORY -->
+<div id="scrHistory" class="scr">
+  <div class="hist-hdr">
+    <div class="avatar" id="histAvatar" style="width:40px;height:40px;font-size:.9rem;flex-shrink:0"></div>
+    <div class="hist-prof-info"><div class="hist-prof-name" id="histName"></div><div class="hist-prof-meta" id="histMeta"></div></div>
+    <button class="btn-sm" onclick="showSetup()">← Voltar</button>
+  </div>
+  <div class="progress-summary" id="progressSummary"></div>
+  <div class="section">
+    <div class="sec-title">📈 Evolução</div>
+    <div class="chart-wrap"><div class="chart-title">PESO (kg)</div><div id="chartWeight"></div></div>
+    <div class="chart-wrap"><div class="chart-title">% GORDURA CORPORAL</div><div id="chartFat"></div></div>
+    <div class="chart-wrap"><div class="chart-title">PONTUAÇÃO GERAL</div><div id="chartScore"></div></div>
+    <div class="chart-wrap"><div class="chart-title">MÉDIA POSTURAL</div><div id="chartPosture"></div></div>
+  </div>
+  <div class="section" style="border-top:1px solid var(--border);padding-top:1.25rem">
+    <div class="sec-title">🗂 Histórico de Scans</div>
+    <div id="scanHistList"></div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div id="scrConfig" class="scr">
+  <div class="cfg-wrap">
+    <div class="logo" style="margin-bottom:2rem">Bio<span>Scan</span></div>
+    <div class="crd">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;margin-bottom:.375rem">Chave de API Claude</h2>
+      <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.25rem;line-height:1.65">Obtenha sua chave em <strong>console.anthropic.com</strong> → API Keys</p>
+      <label class="lbl">Chave de API</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-…" autocomplete="off"/>
+      <button class="btn" onclick="saveKey()" style="margin-top:1.25rem">Salvar →</button>
+      <div class="warn">⚠ Salva apenas localmente neste dispositivo.</div>
     </div>
   </div>
 </div>
 
 <script>
 'use strict';
-
+const AVATAR_COLORS=['#00D4FF','#7C3AED','#10B981','#F59E0B','#F87171','#3B82F6'];
 const STEPS=[
-  {icon:'🧍',num:'PASSO 1 DE 3 — FRENTE',instr:'Fique de frente para a câmera. Braços relaxados ao lado do corpo. Pés na largura dos ombros.'},
-  {icon:'🚶',num:'PASSO 2 DE 3 — LADO DIREITO',instr:'Vire 90° para a direita. Perfil direito voltado para a câmera. Braços relaxados.'},
-  {icon:'🔄',num:'PASSO 3 DE 3 — COSTAS',instr:'Vire completamente de costas para a câmera. Mantenha postura natural.'}
+  {icon:'🧍',num:'PASSO 1 DE 3 — FRENTE',instr:'De frente para a câmera. Braços relaxados, pés na largura dos ombros.'},
+  {icon:'🚶',num:'PASSO 2 DE 3 — LADO DIREITO',instr:'Vire 90° para direita. Perfil direito para a câmera. Braços relaxados.'},
+  {icon:'🔄',num:'PASSO 3 DE 3 — COSTAS',instr:'Completamente de costas. Mantenha postura natural.'}
 ];
 
-let state={
-  apiKey:'',weight:0,height:0,bmi:0,
-  captures:[null,null,null],
-  step:0,stream:null,scanning:false
-};
+let S={key:'',pid:null,weight:0,height:0,captures:[null,null,null],step:0,stream:null,busy:false,aCtx:null,editingProfileId:null,selectedSex:'M'};
 
-// ── SCREENS ──
+// ── INIT ──
+window.addEventListener('load',()=>{
+  S.key=localStorage.getItem('bsk')||'';
+  const profs=loadProfs();
+  if(!S.key){show('scrConfig');return;}
+  if(!profs.length){show('scrNewProf');document.getElementById('npTitle').textContent='Criar Primeiro Perfil';return;}
+  renderProfList();show('scrProfiles');
+});
+
+// ── SCREEN ──
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on')}
 function showCfg(){stopCam();show('scrConfig')}
-function showSetup(){stopCam();show('scrSetup')}
-function saveKey(){
-  const k=document.getElementById('apiKey').value.trim();
-  if(!k.startsWith('sk-')){alert('Chave inválida.');return;}
-  localStorage.setItem('bsk',k);state.apiKey=k;show('scrSetup');
+function showSetup(){
+  const p=getActiveProf();if(!p){show('scrProfiles');return;}
+  document.getElementById('setupAvatar').textContent=initials(p.name);
+  document.getElementById('setupAvatar').style.background=p.color;
+  document.getElementById('setupProfName').textContent=p.name+' · '+(p.sex==='M'?'Masc.':'Fem.');
+  const last=p.scans[p.scans.length-1];
+  if(last){document.getElementById('weight').value=last.weight;document.getElementById('height').value=last.height;}
+  stopCam();show('scrSetup');
 }
+function showSetupFromResults(){show('scrSetup')}
 function cancelScan(){stopCam();show('scrSetup')}
 
-window.addEventListener('load',()=>{
-  const k=localStorage.getItem('bsk');
-  if(k){state.apiKey=k;show('scrSetup')}
-});
+// ── CONFIG ──
+function saveKey(){
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if(!k.startsWith('sk-')){alert('Chave inválida.');return;}
+  localStorage.setItem('bsk',k);S.key=k;
+  const profs=loadProfs();
+  if(!profs.length){show('scrNewProf');}else{renderProfList();show('scrProfiles');}
+}
+
+// ── PROFILES ──
+function loadProfs(){return JSON.parse(localStorage.getItem('bsk_profs')||'[]');}
+function saveProfs(arr){localStorage.setItem('bsk_profs',JSON.stringify(arr));}
+function getActiveProf(){return loadProfs().find(p=>p.id===S.pid)||null;}
+function uuid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function initials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+function renderProfList(){
+  const profs=loadProfs();
+  const el=document.getElementById('profList');
+  if(!profs.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.85rem">Nenhum perfil ainda.<br>Crie seu primeiro perfil abaixo.</div>';return;}
+  el.innerHTML=profs.map(p=>{
+    const scans=p.scans||[];
+    const last=scans[scans.length-1];
+    const meta=last?`${scans.length} scan${scans.length!==1?'s':''} · Último: ${fmtDate(last.date)}`:`Nenhum scan ainda`;
+    return `<div class="prof-card" onclick="selectProf('${p.id}')">
+      <div class="avatar" style="background:${p.color}">${initials(p.name)}</div>
+      <div class="prof-info"><div class="prof-name">${escH(p.name)}</div><div class="prof-meta">${p.sex==='M'?'Masculino':'Feminino'}${p.birthYear?' · '+p.birthYear:''} · ${meta}</div></div>
+      <div class="prof-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+function selectProf(id){S.pid=id;showSetup();}
+
+function showNewProf(profile){
+  S.editingProfileId=profile?profile.id:null;
+  S.selectedSex=profile?profile.sex:'M';
+  document.getElementById('npTitle').textContent=profile?'Editar Perfil':'Novo Perfil';
+  document.getElementById('npName').value=profile?profile.name:'';
+  document.getElementById('npYear').value=profile?profile.birthYear||'':'';
+  document.getElementById('npDeleteBtn').style.display=profile?'block':'none';
+  selSex(S.selectedSex);
+  show('scrNewProf');
+}
+
+function selSex(s){
+  S.selectedSex=s;
+  document.getElementById('sexM').className='sex-btn'+(s==='M'?' sel':'');
+  document.getElementById('sexF').className='sex-btn'+(s==='F'?' sel':'');
+}
+
+function saveProfile(){
+  const name=document.getElementById('npName').value.trim();
+  if(!name){alert('Informe um nome.');return;}
+  const year=document.getElementById('npYear').value;
+  const profs=loadProfs();
+  if(S.editingProfileId){
+    const idx=profs.findIndex(p=>p.id===S.editingProfileId);
+    if(idx>=0){profs[idx].name=name;profs[idx].sex=S.selectedSex;profs[idx].birthYear=year?parseInt(year):null;}
+    saveProfs(profs);S.pid=S.editingProfileId;
+  }else{
+    const colorIdx=profs.length%AVATAR_COLORS.length;
+    const p={id:uuid(),name,sex:S.selectedSex,birthYear:year?parseInt(year):null,color:AVATAR_COLORS[colorIdx],scans:[]};
+    profs.push(p);saveProfs(profs);S.pid=p.id;
+  }
+  showSetup();
+}
+
+function deleteProfile(){
+  if(!confirm('Excluir este perfil e todos os scans? Esta ação não pode ser desfeita.'))return;
+  let profs=loadProfs();profs=profs.filter(p=>p.id!==S.editingProfileId);saveProfs(profs);
+  S.pid=null;renderProfList();show('scrProfiles');
+}
 
 // ── SETUP ──
 function startScan(){
   const w=document.getElementById('weight').value;
   const h=document.getElementById('height').value;
   if(!w||!h){alert('Informe peso e altura.');return;}
-  state.weight=parseFloat(w);state.height=parseFloat(h);
-  state.bmi=(state.weight/Math.pow(state.height/100,2)).toFixed(1);
-  state.captures=[null,null,null];state.step=0;
-  show('scrScan');
-  resetScanUI();
-  initCam();
+  S.weight=parseFloat(w);S.height=parseFloat(h);
+  S.captures=[null,null,null];S.step=0;S.busy=false;S.facingMode='user';
+  resetScanUI();show('scrScan');initCam();
 }
 
 // ── CAMERA ──
 async function initCam(){
   try{
     stopCam();
-    state.stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'user',width:{ideal:1080},height:{ideal:1920}},audio:false
-    });
-    const v=document.getElementById('video');
-    v.srcObject=state.stream;
-    v.style.transform='scaleX(-1)';
-    setStatus('ready','câmera ativa — pronto para capturar');
+    const facing=S.facingMode||'user';
+    S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1080},height:{ideal:1920}},audio:false});
+    const v=document.getElementById('video');v.srcObject=S.stream;
+    v.style.transform=facing==='user'?'scaleX(-1)':'scaleX(1)';
+    const btn=document.getElementById('btnFlipCam');if(btn)btn.textContent=facing==='user'?'🔄':'🔁';
+    setStatus('ready',facing==='user'?'câmera frontal ativa':'câmera traseira ativa');
     document.getElementById('btnCapture').disabled=false;
-  }catch(e){
-    setStatus('','erro: '+e.message);
-    document.getElementById('btnCapture').disabled=true;
-  }
+  }catch(e){setStatus('','erro: '+e.message);document.getElementById('btnCapture').disabled=true;}
 }
-function stopCam(){
-  if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null;}
+function flipCam(){
+  if(S.busy)return;
+  S.facingMode=(!S.facingMode||S.facingMode==='user')?'environment':'user';
+  initCam();
 }
-function setStatus(s,t){
-  document.getElementById('stxt').textContent=t;
-  const d=document.getElementById('sdot');
-  d.className='sdot'+(s?' '+s:'');
 }
+function stopCam(){if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null;}}
+function setStatus(s,t){document.getElementById('stxt').textContent=t;document.getElementById('sdot').className='sdot'+(s?' '+s:'');}
+
+// ── AUDIO ──
+function getACtx(){if(!S.aCtx)S.aCtx=new(window.AudioContext||window.webkitAudioContext)();return S.aCtx;}
+function beep(freq,dur,vol){
+  try{
+    const ctx=getACtx();const osc=ctx.createOscillator();const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.frequency.value=freq;osc.type='sine';
+    gain.gain.setValueAtTime(vol||0.4,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+(dur||150)/1000);
+    osc.start();osc.stop(ctx.currentTime+(dur||150)/1000);
+  }catch(e){}
+}
+function countBeep(n){const freqs=[1200,600,750,900];beep(freqs[n]||880,n===0?350:140,0.45);}
 
 // ── SCAN FLOW ──
 function resetScanUI(){
   updateStepUI();
   [0,1,2].forEach(i=>{
     document.getElementById('ts'+i).className='thumb-slot'+(i===0?' active':'');
+    document.getElementById('th'+i).src='';
   });
 }
-
 function updateStepUI(){
-  const s=STEPS[state.step];
+  const s=STEPS[S.step];
   document.getElementById('stepIcon').textContent=s.icon;
   document.getElementById('stepNum').textContent=s.num;
   document.getElementById('stepInstr').textContent=s.instr;
   [0,1,2].forEach(i=>{
     const d=document.getElementById('pd'+i);
-    if(i<state.step)d.className='prog-dot done';
-    else if(i===state.step)d.className='prog-dot active';
-    else d.className='prog-dot';
+    d.className='prog-dot'+(i<S.step?' done':i===S.step?' active':'');
   });
 }
 
 async function doCapture(){
-  if(state.scanning)return;
-  state.scanning=true;
+  if(S.busy)return;S.busy=true;
   document.getElementById('btnCapture').disabled=true;
   setStatus('scanning','preparando…');
 
-  // Countdown
-  const cd=document.getElementById('cdOverlay');
-  const cn=document.getElementById('cdNum');
+  const cd=document.getElementById('cdOverlay');const cn=document.getElementById('cdNum');
   cd.classList.add('on');
   for(let i=3;i>=1;i--){
-    cn.textContent=i;
-    cn.style.animation='none';cn.offsetHeight;cn.style.animation='cdp 1s ease-out';
-    await sleep(1000);
+    cn.textContent=i;cn.style.animation='none';cn.offsetHeight;cn.style.animation='cdp 1s ease-out';
+    countBeep(i);await sleep(1000);
   }
-  cd.classList.remove('on');
+  countBeep(0);cd.classList.remove('on');
 
-  // Scan animation
   setStatus('scanning','escaneando…');
   document.getElementById('scanGrid').classList.add('on');
   document.getElementById('scanBeam').classList.add('on');
   await sleep(2200);
 
-  // Capture
   const img=captureFrame();
   document.getElementById('scanGrid').classList.remove('on');
   document.getElementById('scanBeam').classList.remove('on');
 
-  // Store and show thumbnail
-  state.captures[state.step]=img;
-  const slot=document.getElementById('ts'+state.step);
-  const thumb=document.getElementById('th'+state.step);
-  thumb.src=img;slot.classList.add('captured');
+  S.captures[S.step]=img;
+  document.getElementById('th'+S.step).src=img;
+  document.getElementById('ts'+S.step).classList.add('captured');
 
-  if(state.step<2){
-    // Next step
-    state.step++;
-    updateStepUI();
-    document.getElementById('ts'+state.step).classList.add('active');
-    setStatus('ready','ótimo! agora '+(state.step===1?'vire de lado direito':'vire de costas'));
+  if(S.step<2){
+    S.step++;updateStepUI();
+    document.getElementById('ts'+S.step).classList.add('active');
+    const msgs=['','vire de lado direito','vire completamente de costas'];
+    setStatus('ready',msgs[S.step]);
     document.getElementById('btnCapture').disabled=false;
   }else{
-    // All done — go to processing
-    stopCam();
-    showProcessing();
+    stopCam();showProcessing();
   }
-  state.scanning=false;
+  S.busy=false;
 }
 
 function captureFrame(){
-  const v=document.getElementById('video');
-  const c=document.getElementById('mainCanvas');
+  const v=document.getElementById('video');const c=document.getElementById('mainCanvas');
   c.width=v.videoWidth;c.height=v.videoHeight;
   const ctx=c.getContext('2d');
-  ctx.translate(c.width,0);ctx.scale(-1,1);
+  if(S.facingMode==='user'||!S.facingMode){ctx.translate(c.width,0);ctx.scale(-1,1);}
   ctx.drawImage(v,0,0);
   return c.toDataURL('image/jpeg',.85);
 }
@@ -637,242 +676,255 @@ function captureFrame(){
 // ── PROCESSING ──
 function showProcessing(){
   show('scrProc');
-  ['pt0','pt1','pt2'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(state.captures[i])el.src=state.captures[i];
-  });
-  resetProcSteps();
-  const delays=[0,3000,7000,11000,15000];
-  delays.forEach((d,i)=>setTimeout(()=>{
+  ['pt0','pt1','pt2'].forEach((id,i)=>{if(S.captures[i])document.getElementById(id).src=S.captures[i];});
+  for(let i=1;i<=5;i++)document.getElementById('ps'+i).className='pstep'+(i===1?' on':'');
+  const d=[0,3000,7000,11000,15000];
+  d.forEach((t,i)=>setTimeout(()=>{
     if(i>0)document.getElementById('ps'+i).className='pstep done';
     if(i<5)document.getElementById('ps'+(i+1)).className='pstep on';
-  },d));
+  },t));
   analyze();
 }
 
-function resetProcSteps(){
-  for(let i=1;i<=5;i++){
-    document.getElementById('ps'+i).className='pstep'+(i===1?' on':'');
-  }
-}
-
-// ── CLAUDE API ──
+// ── API ──
 async function analyze(){
-  const key=state.apiKey||localStorage.getItem('bsk');
-  const b64s=state.captures.map(d=>d.split(',')[1]);
-  const bmi=state.bmi;
-  const cat=bmiCat(bmi);
+  const key=S.key||localStorage.getItem('bsk');
+  const bmi=(S.weight/Math.pow(S.height/100,2)).toFixed(1);
+  const prof=getActiveProf();
+  const sex=prof?prof.sex:'M';
+  const sexLabel=sex==='M'?'masculino':'feminino';
+  const b64s=S.captures.map(d=>d.split(',')[1]);
 
-  const sys=`Você é um especialista em avaliação física, biomecânica postural e fisiologia do exercício. Analisa imagens corporais e produz avaliações estruturadas e precisas. Seja honesto, específico, nunca genérico. Retorne APENAS JSON válido, sem texto extra, sem markdown, sem \`\`\`.`;
+  const sys=`Você é especialista em avaliação física, biomecânica postural e fisiologia do exercício. Retorne APENAS JSON válido, sem texto extra, sem markdown.`;
+  const prompt=`Analise as 3 imagens: FRENTE (img1), LADO DIREITO (img2), COSTAS (img3).
+Dados: Sexo ${sexLabel} · Peso ${S.weight}kg · Altura ${S.height}cm · IMC ${bmi} (${bmiCat(bmi)})
 
-  const prompt=`Analise as 3 imagens: FRENTE (img 1), LADO DIREITO (img 2), COSTAS (img 3).
-Dados: Peso ${state.weight}kg · Altura ${state.height}cm · IMC ${bmi} (${cat})
-
-Retorne SOMENTE este JSON (sem texto antes ou depois):
-{
-  "score_geral": <0-100>,
-  "resumo": "<2-3 frases diretas sobre os principais achados>",
-  "composicao": {
-    "gordura_min": <número>,
-    "gordura_max": <número>,
-    "musculo_score": <0-100>,
-    "morfologia": "<ecto|meso|endo|misto>",
-    "gordura_regiao": "<regiões com mais gordura visível, curto>"
-  },
-  "postura": {
-    "cabeca":          {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
-    "ombros":          {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
-    "coluna_toracica": {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
-    "coluna_lombar":   {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
-    "pelve":           {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
-    "joelhos":         {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"}
-  },
-  "assimetrias": ["<texto>","<texto>"],
-  "anotacoes_frente": [{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max 20 chars>"}],
-  "anotacoes_lado":   [{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max 20 chars>"}],
-  "anotacoes_costas": [{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max 20 chars>"}],
-  "recomendacoes": [
-    {"prioridade":<1-3>,"area":"<área>","exercicio":"<nome>","instrucao":"<instrução concisa>","tipo":"<fortalecer|alongar|mobilidade|postura>"}
-  ]
-}`;
+Retorne SOMENTE este JSON exato:
+{"score_geral":<0-100>,"resumo":"<2-3 frases diretas>","composicao":{"gordura_min":<n>,"gordura_max":<n>,"musculo_score":<0-100>,"morfologia":"<ecto|meso|endo|misto>","gordura_regiao":"<regiões>"},"postura":{"cabeca":{"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<curto>"},"ombros":{"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<curto>"},"coluna_toracica":{"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<curto>"},"coluna_lombar":{"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<curto>"},"pelve":{"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<curto>"},"joelhos":{"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<curto>"}},"assimetrias":["<texto>"],"anotacoes_frente":[{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max20chars>"}],"anotacoes_lado":[{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max20chars>"}],"anotacoes_costas":[{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max20chars>"}],"recomendacoes":[{"prioridade":<1-3>,"area":"<área>","exercicio":"<nome>","instrucao":"<conciso>","tipo":"<fortalecer|alongar|mobilidade|postura>"}]}`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':key,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-opus-4-6',
-        max_tokens:2048,
-        system:sys,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[0]}},
-          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[1]}},
-          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[2]}},
-          {type:'text',text:prompt}
-        ]}]
-      })
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-opus-4-6',max_tokens:2048,system:sys,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[0]}},
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[1]}},
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[2]}},
+        {type:'text',text:prompt}
+      ]}]})
     });
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+res.status);}
     const data=await res.json();
-    let txt=data.content[0].text.trim();
-    txt=txt.replace(/^```(?:json)?/,'').replace(/```$/,'').trim();
+    let txt=data.content[0].text.trim().replace(/^```(?:json)?/,'').replace(/```$/,'').trim();
     const json=JSON.parse(txt);
+    await saveScanToProfile(json);
     renderResults(json);
-  }catch(e){
-    renderError(e.message);
-  }
+  }catch(e){renderError(e.message);}
+}
+
+// ── SAVE SCAN ──
+async function saveScanToProfile(d){
+  const bmi=parseFloat((S.weight/Math.pow(S.height/100,2)).toFixed(1));
+  const p=d.postura||{};
+  const pScores=Object.values(p).map(v=>v.score||0).filter(Boolean);
+  const posturaAvg=pScores.length?Math.round(pScores.reduce((a,b)=>a+b,0)/pScores.length):0;
+  const thumb=await makeThumbnail(S.captures[0]);
+  const scan={
+    id:uuid(),date:new Date().toISOString(),weight:S.weight,height:S.height,bmi,
+    score:d.score_geral||0,gordura_min:d.composicao?.gordura_min||0,gordura_max:d.composicao?.gordura_max||0,
+    musculo_score:d.composicao?.musculo_score||0,morfologia:d.composicao?.morfologia||'',
+    postura_avg:posturaAvg,resumo:d.resumo||'',thumb
+  };
+  const profs=loadProfs();const idx=profs.findIndex(p=>p.id===S.pid);
+  if(idx>=0){profs[idx].scans.push(scan);saveProfs(profs);}
+}
+
+async function makeThumbnail(src){
+  return new Promise(r=>{
+    const img=new Image();img.onload=()=>{
+      const c=document.createElement('canvas');
+      const ratio=Math.min(80/img.width,107/img.height);
+      c.width=Math.round(img.width*ratio);c.height=Math.round(img.height*ratio);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      r(c.toDataURL('image/jpeg',.3));
+    };img.src=src;
+  });
 }
 
 // ── RENDER RESULTS ──
 function renderResults(d){
   show('scrResults');
+  document.getElementById('resSavedPill').innerHTML='<div class="saved-pill" style="margin-top:.25rem">✓ Salvo no perfil</div>';
 
-  // Score ring
   const score=clamp(d.score_geral||0,0,100);
-  const circumference=339.3;
-  const offset=circumference*(1-score/100);
   setTimeout(()=>{
-    document.getElementById('scoreArc').style.strokeDashoffset=offset;
     const arc=document.getElementById('scoreArc');
+    arc.style.strokeDashoffset=339.3*(1-score/100);
     arc.style.stroke=score>=70?'#10B981':score>=50?'#F59E0B':'#EF4444';
   },100);
   document.getElementById('scoreVal').textContent=score;
-  const badge=document.getElementById('scoreBadge');
-  if(score>=75){badge.innerHTML='<span class="score-badge badge-green">Boa forma geral</span>';}
-  else if(score>=50){badge.innerHTML='<span class="score-badge badge-amber">Melhorias recomendadas</span>';}
-  else{badge.innerHTML='<span class="score-badge badge-red">Atenção necessária</span>';}
+  const b=document.getElementById('scoreBadge');
+  b.innerHTML=score>=75?'<span class="score-badge bg">Boa forma geral</span>':score>=50?'<span class="score-badge ba">Melhorias recomendadas</span>':'<span class="score-badge br">Atenção necessária</span>';
 
-  // Stats
   const c=d.composicao||{};
-  const fatStr=c.gordura_min&&c.gordura_max?`${c.gordura_min}–${c.gordura_max}%`:'—%';
+  const fatStr=c.gordura_min&&c.gordura_max?`${c.gordura_min}–${c.gordura_max}%`:'—';
   document.getElementById('statFat').textContent=fatStr;
-  document.getElementById('statBmi').textContent=state.bmi;
-  document.getElementById('statMorpho').textContent=(c.morfologia||'—').charAt(0).toUpperCase()+(c.morfologia||'').slice(1);
-
-  // Resumo
+  document.getElementById('statBmi').textContent=(S.weight/Math.pow(S.height/100,2)).toFixed(1);
+  const m=c.morfologia||'—';document.getElementById('statMorpho').textContent=m.charAt(0).toUpperCase()+m.slice(1);
   document.getElementById('resumoBox').textContent=d.resumo||'—';
-
-  // Bars
-  const fatMid=c.gordura_min&&c.gordura_max?(c.gordura_min+c.gordura_max)/2:0;
   document.getElementById('fatVal').textContent=fatStr;
   document.getElementById('muscleVal').textContent=(c.musculo_score||0)+'%';
   if(c.gordura_regiao)document.getElementById('fatRegion').textContent='Regiões: '+c.gordura_regiao;
-  setTimeout(()=>{
-    document.getElementById('fatBar').style.width=Math.min(fatMid*1.5,100)+'%';
-    document.getElementById('muscleBar').style.width=(c.musculo_score||0)+'%';
-  },400);
+  const fatMid=c.gordura_min&&c.gordura_max?(c.gordura_min+c.gordura_max)/2:0;
+  setTimeout(()=>{document.getElementById('fatBar').style.width=Math.min(fatMid*1.5,100)+'%';document.getElementById('muscleBar').style.width=(c.musculo_score||0)+'%';},400);
 
-  // Body map
-  const p=d.postura||{};
-  const markers={
-    cabeca:['fm-head','bm-head'],
-    ombros:['fm-lshoulder','fm-rshoulder','bm-lshoulder','bm-rshoulder'],
-    coluna_toracica:['fm-spine-t','bm-spine-t'],
-    coluna_lombar:['fm-spine-l','bm-spine-l'],
-    pelve:['fm-pelvis','bm-pelvis'],
-    joelhos:['fm-lknee','fm-rknee','bm-lknee','bm-rknee']
-  };
-  Object.entries(markers).forEach(([key,ids])=>{
-    const item=p[key];if(!item)return;
-    const clr=statusColor(item.status);
-    ids.forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',clr);});
-  });
+  const pm=d.postura||{};
+  const markers={cabeca:['fm-head','bm-head'],ombros:['fm-lsh','fm-rsh','bm-lsh','bm-rsh'],coluna_toracica:['fm-spt','bm-spt'],coluna_lombar:['fm-spl','bm-spl'],pelve:['fm-pelv','bm-pelv'],joelhos:['fm-lkn','fm-rkn','bm-lkn','bm-rkn']};
+  Object.entries(markers).forEach(([k,ids])=>{const it=pm[k];if(!it)return;const clr=sClr(it.status);ids.forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',clr);});});
 
-  // Posture cards
-  const postureInfo=[
-    {key:'cabeca',icon:'🧠',name:'Cabeça e Pescoço'},
-    {key:'ombros',icon:'💪',name:'Ombros'},
-    {key:'coluna_toracica',icon:'🦴',name:'Coluna Torácica'},
-    {key:'coluna_lombar',icon:'🦴',name:'Coluna Lombar'},
-    {key:'pelve',icon:'⚡',name:'Pelve'},
-    {key:'joelhos',icon:'🦵',name:'Joelhos'}
-  ];
-  const pc=document.getElementById('postureCards');
-  pc.innerHTML=postureInfo.map(({key,icon,name})=>{
-    const item=p[key]||{score:0,status:'atencao',nota:'-'};
-    const st=item.status||'atencao';
-    return `<div class="posture-card ${st}">
-      <div class="pc-icon">${icon}</div>
-      <div class="pc-body"><div class="pc-name">${name}</div><div class="pc-note">${item.nota||'—'}</div></div>
-      <div class="pc-score ${st}">${item.score||'—'}</div>
-    </div>`;
-  }).join('');
+  const PI=[{k:'cabeca',i:'🧠',n:'Cabeça e Pescoço'},{k:'ombros',i:'💪',n:'Ombros'},{k:'coluna_toracica',i:'🦴',n:'Coluna Torácica'},{k:'coluna_lombar',i:'🦴',n:'Coluna Lombar'},{k:'pelve',i:'⚡',n:'Pelve'},{k:'joelhos',i:'🦵',n:'Joelhos'}];
+  document.getElementById('postureCards').innerHTML=PI.map(({k,i,n})=>{const it=pm[k]||{score:0,status:'atencao',nota:'—'};const st=it.status||'atencao';return `<div class="posture-card ${st}"><div class="pc-icon">${i}</div><div class="pc-body"><div class="pc-name">${n}</div><div class="pc-note">${escH(it.nota||'—')}</div></div><div class="pc-score ${st}">${it.score||'—'}</div></div>`;}).join('');
 
-  // Annotated photos
   const anns=[d.anotacoes_frente||[],d.anotacoes_lado||[],d.anotacoes_costas||[]];
-  const labels=['Frente','Lado Direito','Costas'];
   [0,1,2].forEach(i=>{
-    const panel=document.getElementById('pp'+i);
-    const img=state.captures[i];
-    if(!img){panel.innerHTML='<div class="no-ann">Imagem não disponível</div>';return;}
-    const canvasId='annCanvas'+i;
-    panel.innerHTML=`<div class="annotated-photo"><canvas id="${canvasId}"></canvas></div><div style="font-size:.75rem;color:var(--muted);margin-top:.5rem;text-align:center">${labels[i]}</div>`;
-    drawAnnotations(canvasId,img,anns[i]);
+    const panel=document.getElementById('pp'+i);const img=S.captures[i];
+    if(!img){panel.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:.82rem">Imagem não disponível</div>';return;}
+    const cid='ac'+i;panel.innerHTML=`<div class="ann-photo"><canvas id="${cid}"></canvas></div>`;
+    drawAnns(cid,img,anns[i]);
   });
 
-  // Asymmetries
-  const al=document.getElementById('asymList');
-  const asym=d.assimetrias||[];
-  al.innerHTML=asym.length?asym.map(a=>`<div class="asym-item">${escHtml(a)}</div>`).join(''):'<div class="asym-item">Nenhuma assimetria significativa detectada</div>';
+  const al=document.getElementById('asymList');const asym=d.assimetrias||[];
+  al.innerHTML=asym.length?asym.map(a=>`<div class="asym-item">${escH(a)}</div>`).join(''):'<div class="asym-item">Nenhuma assimetria significativa detectada</div>';
 
-  // Recommendations
-  const rc=document.getElementById('recCards');
   const recs=d.recomendacoes||[];
-  rc.innerHTML=recs.sort((a,b)=>(a.prioridade||3)-(b.prioridade||3)).map(r=>`
-    <div class="rec-card">
-      <div class="rec-hdr">
-        <div class="rec-prio p${r.prioridade||3}">#${r.prioridade||'—'}</div>
-        <div class="rec-area">${escHtml(r.area||'—')}</div>
-        <div class="rec-type">${escHtml(r.tipo||'')}</div>
-      </div>
-      <div class="rec-exercise">${escHtml(r.exercicio||'—')}</div>
-      <div class="rec-instr">${escHtml(r.instrucao||'—')}</div>
-    </div>`).join('');
+  document.getElementById('recCards').innerHTML=recs.sort((a,b)=>(a.prioridade||3)-(b.prioridade||3)).map(r=>`<div class="rec-card"><div class="rec-hdr"><div class="rec-prio p${r.prioridade||3}">#${r.prioridade||'—'}</div><div class="rec-area">${escH(r.area||'—')}</div><div class="rec-type">${escH(r.tipo||'')}</div></div><div class="rec-exercise">${escH(r.exercicio||'—')}</div><div class="rec-instr">${escH(r.instrucao||'—')}</div></div>`).join('');
 }
 
 function renderError(msg){
   show('scrResults');
-  document.getElementById('resumoBox').innerHTML=`<div class="err-box"><strong>Erro na análise</strong><br><br>${escHtml(msg)}<br><br><small style="opacity:.7">Verifique sua chave de API e conexão.</small></div>`;
+  document.getElementById('resumoBox').innerHTML=`<div class="err-box"><strong>Erro na análise</strong><br><br>${escH(msg)}<br><br><small style="opacity:.7">Verifique sua chave de API e conexão.</small></div>`;
 }
 
-// ── PHOTO ANNOTATIONS ──
-function drawAnnotations(canvasId,imgSrc,annotations){
-  const canvas=document.getElementById(canvasId);
-  if(!canvas)return;
-  const img=new Image();
-  img.onload=()=>{
+// ── DRAW ANNOTATIONS ──
+function drawAnns(cid,imgSrc,anns){
+  const canvas=document.getElementById(cid);if(!canvas)return;
+  const img=new Image();img.onload=()=>{
     canvas.width=img.width;canvas.height=img.height;
-    const ctx=canvas.getContext('2d');
-    ctx.drawImage(img,0,0);
-    if(!annotations||!annotations.length)return;
-    annotations.forEach(a=>{
-      const x=(a.x/100)*img.width;
-      const y=(a.y/100)*img.height;
-      const color=statusColor(a.tipo);
-      const r=Math.max(img.width*.04,20);
-      // Outer glow ring
-      ctx.beginPath();ctx.arc(x,y,r+4,0,Math.PI*2);
-      ctx.strokeStyle=color+'60';ctx.lineWidth=3;ctx.stroke();
-      // Main circle
-      ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
-      ctx.fillStyle=color+'30';ctx.fill();
-      // Label background
-      const fs=Math.max(img.width*.025,13);
-      ctx.font=`bold ${fs}px Inter, sans-serif`;
-      const tw=ctx.measureText(a.label||'').width;
-      const lx=x+r+6;const ly=y+4;
-      ctx.fillStyle='rgba(11,15,26,.78)';
-      ctx.beginPath();ctx.roundRect(lx-4,ly-fs,tw+10,fs+6,4);ctx.fill();
+    const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
+    if(!anns||!anns.length)return;
+    anns.forEach(a=>{
+      const x=(a.x/100)*img.width;const y=(a.y/100)*img.height;const color=sClr(a.tipo);
+      const r=Math.max(img.width*.038,18);
+      ctx.beginPath();ctx.arc(x,y,r+5,0,Math.PI*2);ctx.strokeStyle=color+'50';ctx.lineWidth=3;ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+      ctx.fillStyle=color+'28';ctx.fill();
+      const fs=Math.max(img.width*.024,12);ctx.font=`bold ${fs}px Inter,sans-serif`;
+      const tw=ctx.measureText(a.label||'').width;const lx=x+r+6;const ly=y+4;
+      ctx.fillStyle='rgba(11,15,26,.82)';
+      ctx.beginPath();if(ctx.roundRect)ctx.roundRect(lx-4,ly-fs,tw+10,fs+6,4);else ctx.rect(lx-4,ly-fs,tw+10,fs+6);ctx.fill();
       ctx.fillStyle=color;ctx.fillText(a.label||'',lx+1,ly);
     });
+  };img.src=imgSrc;
+}
+
+// ── HISTORY ──
+function showHistory(){
+  const p=getActiveProf();if(!p){show('scrSetup');return;}
+  const av=document.getElementById('histAvatar');
+  av.textContent=initials(p.name);av.style.background=p.color;
+  document.getElementById('histName').textContent=p.name;
+  const scans=p.scans||[];
+  document.getElementById('histMeta').textContent=`${scans.length} scan${scans.length!==1?'s':''}${p.birthYear?' · Nasc. '+p.birthYear:''}`;
+  renderProgressSummary(scans);
+  renderCharts(scans);
+  renderScanList(scans);
+  show('scrHistory');
+}
+
+function renderProgressSummary(scans){
+  const el=document.getElementById('progressSummary');
+  if(scans.length<2){el.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.8rem;padding:.5rem">Faça mais scans para ver a evolução</div>';return;}
+  const first=scans[0];const last=scans[scans.length-1];
+  function trend(a,b,inverse){const d=(b-a).toFixed(1);const good=inverse?d<0:d>0;return d==0?'→':(good?'↑':'↓');}
+  function trendColor(a,b,inverse){const d=b-a;if(d===0)return'var(--muted)';const good=inverse?d<0:d>0;return good?'var(--green)':'var(--red)';}
+  const wD=(last.weight-first.weight).toFixed(1);
+  const sD=last.score-first.score;
+  const fMid=s=>(s.gordura_min+s.gordura_max)/2;
+  const fD=(fMid(last)-fMid(first)).toFixed(1);
+  el.innerHTML=[
+    {lbl:'PESO',val:`${wD>0?'+':''}${wD}kg`,color:trendColor(first.weight,last.weight,true),tr:trend(first.weight,last.weight,true)},
+    {lbl:'GORDURA',val:`${fD>0?'+':''}${fD}%`,color:trendColor(fMid(first),fMid(last),true),tr:trend(fMid(first),fMid(last),true)},
+    {lbl:'SCORE',val:`${sD>0?'+':''}${sD}`,color:trendColor(first.score,last.score,false),tr:trend(first.score,last.score,false)}
+  ].map(i=>`<div class="prog-card"><div class="prog-val" style="color:${i.color}"><span class="prog-trend">${i.tr}</span>${i.val}</div><div class="prog-lbl">${i.lbl}</div></div>`).join('');
+}
+
+function renderCharts(scans){
+  if(scans.length<1){['chartWeight','chartFat','chartScore','chartPosture'].forEach(id=>{document.getElementById(id).innerHTML='<div class="chart-empty">Nenhum dado ainda</div>';});return;}
+  const data={
+    weight:scans.map(s=>({date:s.date,v:s.weight})),
+    fat:scans.map(s=>({date:s.date,v:(s.gordura_min+s.gordura_max)/2})),
+    score:scans.map(s=>({date:s.date,v:s.score})),
+    posture:scans.map(s=>({date:s.date,v:s.postura_avg}))
   };
-  img.src=imgSrc;
+  renderChart('chartWeight',data.weight,'var(--cyan)','kg',v=>v.toFixed(1));
+  renderChart('chartFat',data.fat,'var(--amber)','%',v=>v.toFixed(1));
+  renderChart('chartScore',data.score,'var(--green)','',v=>Math.round(v));
+  renderChart('chartPosture',data.posture,'var(--purple)','',v=>Math.round(v));
+}
+
+function renderChart(id,data,color,unit,fmt){
+  const el=document.getElementById(id);if(!el)return;
+  if(!data||data.length<1){el.innerHTML='<div class="chart-empty">Sem dados</div>';return;}
+  if(data.length===1){el.innerHTML=`<div style="text-align:center;padding:.875rem;font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:${color}">${fmt(data[0].v)}${unit}</div><div style="text-align:center;font-size:.72rem;color:var(--muted)">${fmtDate(data[0].date)} · 1 scan</div>`;return;}
+  const W=300,H=100,PL=36,PR=8,PT=16,PB=28;
+  const iW=W-PL-PR,iH=H-PT-PB;
+  const vals=data.map(d=>d.v);
+  const minV=Math.min(...vals);const maxV=Math.max(...vals);const rng=maxV-minV||1;
+  const xs=i=>PL+(i/(data.length-1))*iW;
+  const ys=v=>PT+iH-((v-minV)/rng)*iH;
+  const pts=data.map((d,i)=>`${xs(i).toFixed(1)},${ys(d.v).toFixed(1)}`).join(' ');
+  const area=`${PL},${PT+iH} ${pts} ${xs(data.length-1)},${PT+iH}`;
+  const dots=data.map((d,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(d.v).toFixed(1)}" r="3" fill="${color}"/>`).join('');
+  const dLabels=data.map((d,i)=>{
+    const dt=new Date(d.date);
+    const lbl=`${dt.getDate()}/${dt.getMonth()+1}`;
+    return `<text x="${xs(i).toFixed(1)}" y="${H-5}" text-anchor="middle" font-size="8.5" fill="#7A8BA8">${lbl}</text>`;
+  }).join('');
+  const lastX=xs(data.length-1);const lastY=ys(vals[vals.length-1]);
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;overflow:visible">
+    <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+iH}" stroke="#1A2035" stroke-width="1"/>
+    <line x1="${PL}" y1="${PT+iH}" x2="${PL+iW}" y2="${PT+iH}" stroke="#1A2035" stroke-width="1"/>
+    <line x1="${PL}" y1="${PT+iH/2}" x2="${PL+iW}" y2="${PT+iH/2}" stroke="#1A2035" stroke-width="0.5" stroke-dasharray="3,3"/>
+    <polygon points="${area}" fill="${color}18"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+    ${dLabels}
+    <text x="${PL-3}" y="${PT+4}" text-anchor="end" font-size="8.5" fill="#7A8BA8">${fmt(maxV)}${unit}</text>
+    <text x="${PL-3}" y="${PT+iH+4}" text-anchor="end" font-size="8.5" fill="#7A8BA8">${fmt(minV)}${unit}</text>
+    <text x="${lastX}" y="${lastY-8}" text-anchor="middle" font-size="10" fill="${color}" font-weight="bold">${fmt(vals[vals.length-1])}${unit}</text>
+  </svg>`;
+}
+
+function renderScanList(scans){
+  const el=document.getElementById('scanHistList');
+  if(!scans.length){el.innerHTML='<div class="no-scans">Nenhum scan realizado ainda.<br>Faça seu primeiro scan para iniciar o histórico.</div>';return;}
+  el.innerHTML=[...scans].reverse().map(s=>{
+    const sc=s.score||0;const clr=sc>=70?'var(--green)':sc>=50?'var(--amber)':'var(--red)';
+    return `<div class="scan-hist-card">
+      <div class="scan-hist-thumb">${s.thumb?`<img src="${s.thumb}" alt=""/>`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">📷</div>'}</div>
+      <div class="scan-hist-body">
+        <div class="scan-hist-date">${fmtDateFull(s.date)}</div>
+        <div class="scan-hist-stats">
+          <div class="hist-stat"><strong>${s.weight}kg</strong> peso</div>
+          <div class="hist-stat"><strong>${((s.gordura_min+s.gordura_max)/2).toFixed(1)}%</strong> gord.</div>
+          <div class="hist-stat"><strong>${s.musculo_score}%</strong> musc.</div>
+          <div class="hist-stat"><strong>${s.postura_avg}</strong> postura</div>
+        </div>
+        ${s.resumo?`<div style="font-size:.72rem;color:var(--muted);margin-top:.375rem;line-height:1.5">${escH(s.resumo.slice(0,100))}${s.resumo.length>100?'…':''}</div>`:''}
+      </div>
+      <div class="scan-hist-score" style="color:${clr}">${sc}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── TABS ──
@@ -882,11 +934,13 @@ function switchTab(i){
 }
 
 // ── UTILS ──
-function statusColor(s){return s==='bom'?'#10B981':s==='corrigir'?'#EF4444':'#F59E0B';}
+function sClr(s){return s==='bom'?'#10B981':s==='corrigir'?'#EF4444':'#F59E0B';}
 function bmiCat(b){b=parseFloat(b);if(b<18.5)return'abaixo do peso';if(b<25)return'peso normal';if(b<30)return'sobrepeso';if(b<35)return'obesidade grau I';return'obesidade grau II+';}
 function clamp(v,a,b){return Math.min(Math.max(v,a),b);}
-function escHtml(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escH(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function fmtDate(iso){const d=new Date(iso);return`${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;}
+function fmtDateFull(iso){const d=new Date(iso);const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];return`${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} · ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;}
 </script>
 </body>
 </html>
