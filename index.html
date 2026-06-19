@@ -2,553 +2,890 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>BioScan — Avaliação Física por IA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0B0F1A;--bg-card:#131929;--bg-card2:#1A2035;
-  --cyan:#00D4FF;--cyan-dim:rgba(0,212,255,0.12);
-  --purple:#7C3AED;--green:#10B981;--amber:#F59E0B;--red:#EF4444;
-  --text:#F0F4FF;--muted:#7A8BA8;--border:rgba(0,212,255,0.15);
+  --bg:#0B0F1A;--card:#131929;--card2:#1A2035;
+  --cyan:#00D4FF;--cdim:rgba(0,212,255,.12);
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--purple:#7C3AED;
+  --text:#F0F4FF;--muted:#7A8BA8;--border:rgba(0,212,255,.15);
 }
-html{height:100%}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-.screen{display:none;min-height:100vh}
-.screen.active{display:block}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+.scr{display:none;position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scr.on{display:block}
 
-/* ── CONFIG ── */
-.config-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1.25rem}
-.logo{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--cyan);letter-spacing:-0.03em;margin-bottom:.375rem}
+/* CONFIG */
+.cfg-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--cyan);letter-spacing:-.03em}
 .logo span{color:var(--text)}
-.tagline{color:var(--muted);font-size:.875rem;margin-bottom:2.5rem;text-align:center;line-height:1.6}
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;width:100%;max-width:420px}
-.card h2{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:.375rem}
-.card p{color:var(--muted);font-size:.82rem;margin-bottom:1.375rem;line-height:1.65}
-.lbl{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.4rem;letter-spacing:.03em}
+.sub{color:var(--muted);font-size:.85rem;margin:.375rem 0 2.5rem;text-align:center;line-height:1.6}
+.crd{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.75rem;width:100%;max-width:420px}
+.crd h2{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:.375rem}
+.crd p{color:var(--muted);font-size:.82rem;margin-bottom:1.375rem;line-height:1.65}
+.lbl{display:block;font-size:.73rem;color:var(--muted);margin-bottom:.4rem;letter-spacing:.04em;text-transform:uppercase}
 input[type=text],input[type=password],input[type=number]{
   width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
   padding:.7rem .9rem;color:var(--text);font-family:'JetBrains Mono',monospace;
-  font-size:.85rem;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none
+  font-size:.85rem;outline:none;transition:border-color .2s;-webkit-appearance:none
 }
 input:focus{border-color:var(--cyan)}
-.btn-primary{
+.btn{
   width:100%;padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;
   border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:1rem;
   font-weight:700;cursor:pointer;margin-top:1.25rem;transition:opacity .2s,transform .1s;letter-spacing:.02em
 }
-.btn-primary:hover{opacity:.9}
-.btn-primary:active{transform:scale(.98)}
-.warn-box{
-  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;
-  padding:.75rem .9rem;font-size:.78rem;color:var(--amber);margin-top:.875rem;line-height:1.55
-}
-.link-info{font-size:.78rem;color:var(--muted);text-align:center;margin-top:1rem;line-height:1.6}
-.link-info a{color:var(--cyan);text-decoration:none}
+.btn:hover{opacity:.9}.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--cyan);border:1px solid rgba(0,212,255,.35)}
+.btn.ghost:hover{background:var(--cdim)}
+.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:9px;padding:.75rem .9rem;font-size:.78rem;color:var(--amber);margin-top:.875rem;line-height:1.55}
 
-/* ── MAIN ── */
-.main-screen{display:flex;flex-direction:column}
-header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.hlogo{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:var(--cyan)}
-.hlogo span{color:var(--text)}
-.btn-sm{
-  background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;
-  padding:.35rem .7rem;font-size:.78rem;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .2s,color .2s
-}
-.btn-sm:hover{border-color:var(--cyan);color:var(--cyan)}
+/* SETUP */
+.setup-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem}
+.setup-title{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:.375rem;text-align:center}
+.setup-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem;text-align:center;line-height:1.6}
+.measures{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;width:100%;max-width:380px;margin-bottom:1.25rem}
+.mi{font-size:1.3rem!important;font-family:'Space Grotesk',sans-serif!important;font-weight:700!important;text-align:center;padding:.6rem!important}
+.scan-steps-preview{display:flex;gap:1rem;margin:1.5rem 0 2rem;width:100%;max-width:380px}
+.step-prev{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.875rem .5rem;text-align:center}
+.step-prev .sp-icon{font-size:1.75rem;margin-bottom:.375rem}
+.step-prev .sp-label{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em}
 
-.measures{padding:.875rem 1.25rem .5rem;flex-shrink:0}
-.measures-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-.measure-input{
-  font-size:1.15rem!important;font-family:'Space Grotesk',sans-serif!important;
-  font-weight:600!important;padding:.55rem .75rem!important;text-align:center
-}
+/* SCAN */
+.scan-scr{display:flex;flex-direction:column;height:100%}
+.scan-hdr{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;flex-shrink:0;background:var(--bg);z-index:10}
+.scan-hdr .logo-sm{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--cyan)}
+.scan-hdr .logo-sm span{color:var(--text)}
+.btn-sm{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.35rem .7rem;font-size:.78rem;cursor:pointer;font-family:'Inter',sans-serif}
 
-.cam-wrap{position:relative;width:100%;flex:1;min-height:0;background:#000;overflow:hidden}
+.progress-bar{display:flex;gap:.5rem;padding:.5rem 1.25rem;flex-shrink:0;background:var(--bg)}
+.prog-dot{flex:1;height:3px;background:var(--card2);border-radius:99px;transition:background .4s}
+.prog-dot.done{background:var(--green)}
+.prog-dot.active{background:var(--cyan)}
+
+.step-guide{
+  display:flex;align-items:center;gap:.875rem;
+  padding:.75rem 1.25rem;background:var(--card);flex-shrink:0;
+  border-bottom:1px solid var(--border)
+}
+.step-icon{font-size:2rem;flex-shrink:0}
+.step-text{}
+.step-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--cyan);letter-spacing:.05em;margin-bottom:.2rem}
+.step-instr{font-size:.83rem;color:var(--text);line-height:1.4}
+
+.cam-container{position:relative;flex:1;background:#000;overflow:hidden;min-height:0}
 #video{width:100%;height:100%;object-fit:cover;display:block}
 .cam-overlay{position:absolute;inset:0;pointer-events:none}
-
-.scan-grid{
-  position:absolute;inset:0;opacity:0;
-  background-image:linear-gradient(rgba(0,212,255,.07) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,212,255,.07) 1px,transparent 1px);
-  background-size:42px 42px;transition:opacity .5s
-}
+.scan-grid{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(0,212,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.06) 1px,transparent 1px);background-size:44px 44px;transition:opacity .5s}
 .scan-grid.on{opacity:1}
-
-.scan-beam{
-  position:absolute;left:0;right:0;height:3px;
-  background:var(--cyan);box-shadow:0 0 18px var(--cyan),0 0 36px rgba(0,212,255,.4);
-  opacity:0
-}
-.scan-beam.on{opacity:1;animation:beam 2.2s ease-in-out infinite}
-@keyframes beam{0%{top:0%}50%{top:96%}100%{top:0%}}
-
+.scan-beam{position:absolute;left:0;right:0;height:3px;background:var(--cyan);box-shadow:0 0 16px var(--cyan),0 0 32px rgba(0,212,255,.4);opacity:0}
+.scan-beam.on{opacity:1;animation:beam 2.4s ease-in-out infinite}
+@keyframes beam{0%{top:0}50%{top:97%}100%{top:0}}
 .corners{position:absolute;inset:0}
-.c{position:absolute;width:22px;height:22px;border-color:var(--cyan);border-style:solid;opacity:.85}
-.c-tl{top:14px;left:14px;border-width:2px 0 0 2px}
-.c-tr{top:14px;right:14px;border-width:2px 2px 0 0}
-.c-bl{bottom:14px;left:14px;border-width:0 0 2px 2px}
-.c-br{bottom:14px;right:14px;border-width:0 2px 2px 0}
+.c{position:absolute;width:22px;height:22px;border-color:var(--cyan);border-style:solid;opacity:.8}
+.c-tl{top:12px;left:12px;border-width:2px 0 0 2px}
+.c-tr{top:12px;right:12px;border-width:2px 2px 0 0}
+.c-bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
+.c-br{bottom:12px;right:12px;border-width:0 2px 2px 0}
+.cd-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,15,26,.65);opacity:0;transition:opacity .3s}
+.cd-overlay.on{opacity:1}
+.cd-num{font-family:'Space Grotesk',sans-serif;font-size:8rem;font-weight:700;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.6);animation:cdp 1s ease-out}
+@keyframes cdp{0%{transform:scale(1.5);opacity:0}100%{transform:scale(1);opacity:1}}
 
-.countdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,15,26,.65);opacity:0;transition:opacity .3s}
-.countdown.on{opacity:1}
-.cnum{font-family:'Space Grotesk',sans-serif;font-size:7rem;font-weight:700;color:var(--cyan);text-shadow:0 0 28px rgba(0,212,255,.6);animation:cpulse 1s ease-out}
-@keyframes cpulse{0%{transform:scale(1.4);opacity:0}100%{transform:scale(1);opacity:1}}
-
-.status-bar{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1rem;background:var(--bg-card);flex-shrink:0}
-.status-txt{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)}
-.sdot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.scan-footer{padding:.875rem 1.25rem;background:var(--bg);flex-shrink:0;display:flex;flex-direction:column;gap:.625rem}
+.status-row{display:flex;align-items:center;justify-content:space-between}
+.stxt{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .sdot.ready{background:var(--green);animation:dp 2s infinite}
 .sdot.scanning{background:var(--cyan);animation:dp .5s infinite}
-@keyframes dp{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.2}}
 
-.controls{padding:.875rem 1.25rem;display:flex;gap:.75rem;align-items:center;flex-shrink:0}
-.btn-scan{
-  flex:1;padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;border-radius:12px;
+.thumbs-row{display:flex;gap:.5rem;height:54px}
+.thumb-slot{
+  flex:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);
+  background:var(--card);display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);position:relative
+}
+.thumb-slot img{width:100%;height:100%;object-fit:cover;display:none}
+.thumb-slot.captured img{display:block}
+.thumb-slot.captured .slot-lbl{display:none}
+.thumb-slot.active{border-color:var(--cyan)}
+
+.btn-capture{
+  padding:.875rem;background:var(--cyan);color:#0B0F1A;border:none;border-radius:12px;
   font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;
   transition:opacity .2s,transform .1s;letter-spacing:.03em
 }
-.btn-scan:disabled{opacity:.35;cursor:not-allowed}
-.btn-scan:not(:disabled):hover{opacity:.9}
-.btn-scan:not(:disabled):active{transform:scale(.98)}
-.btn-flip{
-  width:46px;height:46px;background:var(--bg-card);border:1px solid var(--border);
-  border-radius:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;
-  justify-content:center;font-size:1.2rem;flex-shrink:0;transition:border-color .2s,color .2s
-}
-.btn-flip:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-capture:disabled{opacity:.35;cursor:not-allowed}
+.btn-capture:not(:disabled):active{transform:scale(.98)}
 
-.hint{padding:0 1.25rem .875rem;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.65;flex-shrink:0}
-
-/* ── RESULTS ── */
-.results-screen{display:flex;flex-direction:column}
-.results-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.results-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600}
-
-.thumb-wrap{position:relative;width:100%;background:#000;flex-shrink:0}
-#captureThumb{width:100%;display:block;object-fit:cover;max-height:52vh}
-.thumb-badge{
-  position:absolute;bottom:10px;right:10px;background:rgba(11,15,26,.8);
-  border:1px solid var(--border);border-radius:8px;padding:.35rem .65rem;
-  font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--cyan)
-}
-
-.results-body{flex:1;overflow-y:auto;padding:1.25rem}
-
-.loading-state{text-align:center;padding:2.5rem 1rem}
+/* PROCESSING */
+.proc-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:2rem 1.25rem;text-align:center}
+.proc-thumbs{display:flex;gap:.75rem;margin-bottom:2rem}
+.proc-thumb{width:90px;height:120px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--card)}
+.proc-thumb img{width:100%;height:100%;object-fit:cover}
 .spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.25rem}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-lbl{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--cyan)}
-.loading-sub{font-size:.78rem;color:var(--muted);margin-top:.4rem}
-.steps{margin-top:1.5rem;text-align:left;display:inline-block}
-.step{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);padding:.2rem 0;opacity:0;transition:opacity .4s,color .4s}
-.step.on{opacity:1;color:var(--cyan)}
-.step.done{opacity:.6;color:var(--green)}
+.proc-lbl{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--cyan);margin-bottom:.4rem}
+.proc-sub{font-size:.78rem;color:var(--muted);margin-bottom:1.5rem}
+.pstep{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);padding:.2rem 0;opacity:0;transition:opacity .4s,color .3s;text-align:left}
+.pstep.on{opacity:1;color:var(--cyan)}
+.pstep.done{opacity:.6;color:var(--green)}
 
-.results-out{display:none}
-.results-card{
-  background:var(--bg-card);border:1px solid var(--border);border-radius:16px;
-  padding:1.375rem;font-size:.88rem;line-height:1.8;color:var(--text)
-}
-.results-card h3{
-  font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;
-  color:var(--cyan);margin:1.25rem 0 .5rem;padding-bottom:.375rem;
-  border-bottom:1px solid var(--cyan-dim)
-}
-.results-card h3:first-child{margin-top:0}
-.disclaimer{
-  background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);
-  border-radius:10px;padding:.875rem 1rem;font-size:.78rem;color:#A78BFA;
-  margin-top:1rem;line-height:1.6
-}
-.err-box{
-  background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.28);
-  border-radius:12px;padding:1.25rem;color:#FCA5A5;font-size:.87rem;line-height:1.7
-}
+/* RESULTS */
+.res-scr{padding-bottom:3rem}
+.res-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:20}
+.res-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600}
 
-.btn-new{
-  width:100%;padding:.875rem;background:transparent;color:var(--cyan);
-  border:1px solid rgba(0,212,255,.35);border-radius:12px;
-  font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;
-  cursor:pointer;margin-top:1.25rem;transition:background .2s
-}
-.btn-new:hover{background:var(--cyan-dim)}
+/* Score hero */
+.score-hero{padding:1.5rem 1.25rem 1rem;text-align:center;border-bottom:1px solid var(--border)}
+.score-ring{display:flex;justify-content:center;margin-bottom:.75rem}
+.score-ring svg{width:130px;height:130px}
+.score-val{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;fill:var(--text)}
+.score-unit{font-size:.75rem;fill:var(--muted);font-family:'Inter',sans-serif}
+.score-label{font-size:.85rem;color:var(--muted);margin-bottom:.25rem}
+.score-badge{display:inline-block;padding:.3rem .875rem;border-radius:99px;font-size:.8rem;font-weight:600;font-family:'Space Grotesk',sans-serif}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.badge-amber{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+.stat-card{background:var(--card);border-radius:12px;padding:.875rem .625rem;text-align:center}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700;color:var(--cyan);line-height:1}
+.stat-lbl{font-size:.68rem;color:var(--muted);margin-top:.3rem;letter-spacing:.03em}
+
+/* Composição */
+.section{padding:1.25rem}
+.sec-title{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:600;color:var(--cyan);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.bar-item{margin-bottom:1rem}
+.bar-hdr{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.4rem}
+.bar-lbl{color:var(--muted)}
+.bar-val{font-family:'JetBrains Mono',monospace;color:var(--text);font-size:.78rem}
+.bar-track{height:8px;background:var(--card2);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.morpho-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.625rem 1rem;font-size:.85rem;margin-top:.5rem}
+.morpho-badge strong{font-family:'Space Grotesk',sans-serif;color:var(--cyan)}
+
+/* Postura body map */
+.body-map-wrap{display:flex;gap:1rem;justify-content:center;margin-bottom:1.25rem}
+.body-map-col{text-align:center}
+.body-map-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:.375rem;letter-spacing:.04em}
+.body-map-col svg{width:80px;height:180px}
+.posture-legend{display:flex;gap:1rem;justify-content:center;margin-bottom:1.25rem}
+.leg-item{display:flex;align-items:center;gap:.375rem;font-size:.73rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+.posture-cards{display:flex;flex-direction:column;gap:.625rem}
+.posture-card{background:var(--card);border-radius:12px;padding:.875rem 1rem;display:flex;align-items:center;gap:.875rem;border-left:3px solid transparent}
+.posture-card.bom{border-color:var(--green)}
+.posture-card.atencao{border-color:var(--amber)}
+.posture-card.corrigir{border-color:var(--red)}
+.pc-icon{font-size:1.25rem;flex-shrink:0}
+.pc-body{flex:1}
+.pc-name{font-size:.82rem;font-weight:500;margin-bottom:.2rem}
+.pc-note{font-size:.75rem;color:var(--muted);line-height:1.4}
+.pc-score{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;flex-shrink:0}
+.pc-score.bom{color:var(--green)}
+.pc-score.atencao{color:var(--amber)}
+.pc-score.corrigir{color:var(--red)}
+
+/* Photo tabs */
+.photo-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 1.25rem;gap:0}
+.ptab{flex:1;padding:.625rem;text-align:center;font-size:.8rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;font-family:'Space Grotesk',sans-serif;font-weight:500}
+.ptab.active{color:var(--cyan);border-color:var(--cyan)}
+.photo-panel{display:none;padding:1.25rem}
+.photo-panel.active{display:block}
+.annotated-photo{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
+.annotated-photo canvas{width:100%;display:block}
+.no-ann{padding:2rem;text-align:center;color:var(--muted);font-size:.82rem;background:var(--card);border-radius:12px}
+
+/* Recommendations */
+.rec-card{background:var(--card);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.75rem;border:1px solid var(--border)}
+.rec-hdr{display:flex;align-items:center;gap:.625rem;margin-bottom:.5rem}
+.rec-prio{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:.75rem;font-weight:700;flex-shrink:0}
+.p1{background:rgba(239,68,68,.15);color:var(--red)}.p2{background:rgba(245,158,11,.12);color:var(--amber)}.p3{background:rgba(16,185,129,.12);color:var(--green)}
+.rec-area{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:600}
+.rec-type{margin-left:auto;font-size:.7rem;padding:.2rem .6rem;border-radius:99px;background:var(--card2);color:var(--muted)}
+.rec-exercise{font-size:.85rem;font-weight:500;margin-bottom:.3rem;color:var(--cyan)}
+.rec-instr{font-size:.78rem;color:var(--muted);line-height:1.55}
+
+.asym-list{background:var(--card);border-radius:12px;padding:.875rem 1rem}
+.asym-item{font-size:.82rem;color:var(--text);padding:.375rem 0;border-bottom:1px solid var(--border);display:flex;gap:.5rem;line-height:1.4}
+.asym-item:last-child{border-bottom:none}
+.asym-item::before{content:'⚖️';flex-shrink:0}
+
+.resumo-box{background:rgba(0,212,255,.06);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;font-size:.83rem;line-height:1.7;color:var(--text);margin-bottom:1.25rem}
+
+.err-box{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.28);border-radius:12px;padding:1.25rem;color:#FCA5A5;font-size:.87rem;line-height:1.7}
 
 canvas{display:none}
+#mainCanvas{display:none}
 </style>
 </head>
 <body>
 
-<!-- ── CONFIG SCREEN ── -->
-<div id="configScreen" class="screen active">
-  <div class="config-wrap">
+<!-- CONFIG -->
+<div id="scrConfig" class="scr on">
+  <div class="cfg-wrap">
     <div class="logo">Bio<span>Scan</span></div>
-    <p class="tagline">Avaliação física e postural por inteligência artificial.<br>Composição corporal · Postura · Assimetrias</p>
-
-    <div class="card">
-      <h2>Configurar chave de API</h2>
-      <p>O BioScan usa o Claude (Anthropic) para analisar as imagens. Você precisa de uma chave de API, que pode ser criada gratuitamente em <strong>console.anthropic.com</strong>.</p>
-      <label class="lbl">CHAVE DE API (claude)</label>
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" />
-      <button class="btn-primary" onclick="saveConfig()">Salvar e Começar →</button>
-      <div class="warn-box">⚠ A chave é salva apenas localmente neste dispositivo e nunca enviada para servidores do app. Recomendamos configurar um limite de gastos na conta Anthropic.</div>
+    <p class="sub">Avaliação física e postural por IA<br>Frente · Lado · Costas</p>
+    <div class="crd">
+      <h2>Chave de API (Claude)</h2>
+      <p>Crie sua chave gratuitamente em <strong>console.anthropic.com</strong> → Settings → API Keys</p>
+      <label class="lbl">Chave de API</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-…" autocomplete="off"/>
+      <button class="btn" onclick="saveKey()">Salvar e Continuar →</button>
+      <div class="warn">⚠ A chave é salva apenas neste dispositivo. Configure um limite de gasto na conta Anthropic para segurança.</div>
     </div>
-
-    <p class="link-info">Precisa de uma chave? <a href="https://console.anthropic.com/settings/keys" target="_blank">Criar em console.anthropic.com →</a></p>
   </div>
 </div>
 
-<!-- ── MAIN SCREEN ── -->
-<div id="mainScreen" class="screen main-screen">
-  <header>
-    <div class="hlogo">Bio<span>Scan</span></div>
-    <button class="btn-sm" onclick="showConfig()">⚙ API</button>
-  </header>
-
-  <div class="measures">
-    <div class="measures-grid">
+<!-- SETUP -->
+<div id="scrSetup" class="scr">
+  <div class="setup-wrap">
+    <div class="logo">Bio<span>Scan</span></div>
+    <p class="sub">Insira suas medidas e inicie o scan de 3 ângulos</p>
+    <div class="measures">
       <div>
-        <label class="lbl">PESO ATUAL (kg)</label>
-        <input type="number" id="weight" class="measure-input" placeholder="75" min="30" max="300" inputmode="decimal" />
+        <label class="lbl">Peso (kg)</label>
+        <input type="number" id="weight" class="mi" placeholder="75" min="30" max="300" inputmode="decimal"/>
       </div>
       <div>
-        <label class="lbl">ALTURA (cm)</label>
-        <input type="number" id="height" class="measure-input" placeholder="170" min="100" max="230" inputmode="decimal" />
+        <label class="lbl">Altura (cm)</label>
+        <input type="number" id="height" class="mi" placeholder="170" min="100" max="230" inputmode="decimal"/>
       </div>
     </div>
-  </div>
-
-  <div class="cam-wrap" id="camWrap">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas"></canvas>
-    <div class="cam-overlay">
-      <div class="scan-grid" id="scanGrid"></div>
-      <div class="scan-beam" id="scanBeam"></div>
-      <div class="corners">
-        <div class="c c-tl"></div>
-        <div class="c c-tr"></div>
-        <div class="c c-bl"></div>
-        <div class="c c-br"></div>
-      </div>
-      <div class="countdown" id="countdown">
-        <span class="cnum" id="cnum">3</span>
-      </div>
+    <div class="scan-steps-preview">
+      <div class="step-prev"><div class="sp-icon">🧍</div><div class="sp-label">FRENTE</div></div>
+      <div class="step-prev"><div class="sp-icon">🚶</div><div class="sp-label">LADO DIR.</div></div>
+      <div class="step-prev"><div class="sp-icon">🔄</div><div class="sp-label">COSTAS</div></div>
+    </div>
+    <div style="width:100%;max-width:380px">
+      <button class="btn" onclick="startScan()">Iniciar Scan de 3 Ângulos →</button>
+      <button class="btn ghost" onclick="showCfg()" style="margin-top:.625rem">⚙ Trocar API</button>
     </div>
   </div>
-
-  <div class="status-bar">
-    <span class="status-txt" id="statusTxt">aguardando câmera…</span>
-    <div class="sdot" id="sdot"></div>
-  </div>
-
-  <div class="controls">
-    <button class="btn-scan" id="btnScan" onclick="startScan()" disabled>Iniciar Scan</button>
-    <button class="btn-flip" onclick="flipCamera()" title="Trocar câmera">⟳</button>
-  </div>
-
-  <p class="hint">Fique em pé, de frente para a câmera, com o corpo todo visível.<br>Roupas justas garantem maior precisão na avaliação.</p>
 </div>
 
-<!-- ── RESULTS SCREEN ── -->
-<div id="resultsScreen" class="screen results-screen">
-  <div class="results-hdr">
-    <span class="results-title">Relatório BioScan</span>
-    <button class="btn-sm" onclick="backToMain()">← Voltar</button>
-  </div>
-
-  <div class="thumb-wrap">
-    <img id="captureThumb" alt="Foto capturada" />
-    <div class="thumb-badge" id="thumbBadge">IMC —</div>
-  </div>
-
-  <div class="results-body">
-    <div class="loading-state" id="loadingState">
-      <div class="spinner"></div>
-      <div class="loading-lbl">Analisando com IA…</div>
-      <div class="loading-sub">Pode levar alguns segundos</div>
-      <div class="steps">
-        <div class="step on" id="s1">▸ Processando imagem…</div>
-        <div class="step" id="s2">▸ Estimando composição corporal…</div>
-        <div class="step" id="s3">▸ Avaliando postura e alinhamento…</div>
-        <div class="step" id="s4">▸ Gerando recomendações…</div>
+<!-- SCAN -->
+<div id="scrScan" class="scr">
+  <div class="scan-scr" style="height:100%;display:flex;flex-direction:column">
+    <div class="scan-hdr">
+      <div class="logo-sm">Bio<span>Scan</span></div>
+      <button class="btn-sm" onclick="cancelScan()">✕ Cancelar</button>
+    </div>
+    <div class="progress-bar">
+      <div class="prog-dot active" id="pd0"></div>
+      <div class="prog-dot" id="pd1"></div>
+      <div class="prog-dot" id="pd2"></div>
+    </div>
+    <div class="step-guide">
+      <div class="step-icon" id="stepIcon">🧍</div>
+      <div class="step-text">
+        <div class="step-num" id="stepNum">PASSO 1 DE 3</div>
+        <div class="step-instr" id="stepInstr">Fique de frente, braços relaxados ao lado do corpo, pés afastados na largura dos ombros</div>
       </div>
     </div>
-
-    <div class="results-out" id="resultsOut">
-      <div class="results-card" id="resultsCard"></div>
-      <div class="disclaimer">
-        ⚠ <strong>Aviso:</strong> Esta avaliação é uma estimativa visual gerada por inteligência artificial com fins educativos e informativos. Não substitui avaliação de médico, fisioterapeuta ou educador físico. Consulte um profissional de saúde para diagnóstico preciso.
+    <div class="cam-container" id="camContainer">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="mainCanvas"></canvas>
+      <div class="cam-overlay">
+        <div class="scan-grid" id="scanGrid"></div>
+        <div class="scan-beam" id="scanBeam"></div>
+        <div class="corners"><div class="c c-tl"></div><div class="c c-tr"></div><div class="c c-bl"></div><div class="c c-br"></div></div>
+        <div class="cd-overlay" id="cdOverlay"><span class="cd-num" id="cdNum">3</span></div>
       </div>
-      <button class="btn-new" onclick="backToMain()">+ Novo Scan</button>
+    </div>
+    <div class="scan-footer">
+      <div class="status-row">
+        <span class="stxt" id="stxt">câmera iniciando…</span>
+        <div class="sdot" id="sdot"></div>
+      </div>
+      <div class="thumbs-row">
+        <div class="thumb-slot" id="ts0"><span class="slot-lbl">FRENTE</span><img id="th0" alt=""/></div>
+        <div class="thumb-slot" id="ts1"><span class="slot-lbl">LADO</span><img id="th1" alt=""/></div>
+        <div class="thumb-slot" id="ts2"><span class="slot-lbl">COSTAS</span><img id="th2" alt=""/></div>
+      </div>
+      <button class="btn-capture btn" id="btnCapture" onclick="doCapture()" disabled>📸 Capturar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESSING -->
+<div id="scrProc" class="scr">
+  <div class="proc-wrap">
+    <div class="proc-thumbs">
+      <div class="proc-thumb"><img id="pt0" alt="Frente"/></div>
+      <div class="proc-thumb"><img id="pt1" alt="Lado"/></div>
+      <div class="proc-thumb"><img id="pt2" alt="Costas"/></div>
+    </div>
+    <div class="spinner"></div>
+    <div class="proc-lbl">Analisando com Claude AI…</div>
+    <div class="proc-sub">Avaliando composição, postura e assimetrias</div>
+    <div>
+      <div class="pstep on" id="ps1">▸ Processando as 3 imagens…</div>
+      <div class="pstep" id="ps2">▸ Estimando composição corporal…</div>
+      <div class="pstep" id="ps3">▸ Mapeando alinhamento postural…</div>
+      <div class="pstep" id="ps4">▸ Detectando assimetrias…</div>
+      <div class="pstep" id="ps5">▸ Gerando recomendações…</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="scrResults" class="scr res-scr">
+  <div class="res-hdr">
+    <span class="res-title">Relatório BioScan</span>
+    <button class="btn-sm" onclick="showSetup()">← Novo Scan</button>
+  </div>
+
+  <!-- Score -->
+  <div class="score-hero">
+    <div class="score-ring">
+      <svg viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="54" fill="none" stroke="#1A2035" stroke-width="10"/>
+        <circle id="scoreArc" cx="65" cy="65" r="54" fill="none" stroke="#00D4FF" stroke-width="10"
+          stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"
+          transform="rotate(-90 65 65)" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+        <text id="scoreVal" x="65" y="58" text-anchor="middle" dominant-baseline="central"
+          font-family="'Space Grotesk',sans-serif" font-size="28" font-weight="700" fill="#F0F4FF">—</text>
+        <text x="65" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#7A8BA8">/ 100</text>
+      </svg>
+    </div>
+    <div class="score-label">Pontuação Geral</div>
+    <div id="scoreBadge"></div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="statFat">—%</div><div class="stat-lbl">GORDURA EST.</div></div>
+    <div class="stat-card"><div class="stat-val" id="statBmi">—</div><div class="stat-lbl">IMC</div></div>
+    <div class="stat-card"><div class="stat-val" id="statMorpho">—</div><div class="stat-lbl">MORFOLOGIA</div></div>
+  </div>
+
+  <!-- Resumo -->
+  <div class="section">
+    <div class="sec-title">💬 Resumo da Avaliação</div>
+    <div class="resumo-box" id="resumoBox">—</div>
+  </div>
+
+  <!-- Composição -->
+  <div class="section" style="border-top:1px solid var(--border)">
+    <div class="sec-title">🔬 Composição Corporal</div>
+    <div class="bar-item">
+      <div class="bar-hdr"><span class="bar-lbl">% Gordura Corporal</span><span class="bar-val" id="fatVal">—</span></div>
+      <div class="bar-track"><div class="bar-fill" id="fatBar" style="background:var(--amber)"></div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-hdr"><span class="bar-lbl">Massa Muscular Relativa</span><span class="bar-val" id="muscleVal">—</span></div>
+      <div class="bar-track"><div class="bar-fill" id="muscleBar" style="background:var(--cyan)"></div></div>
+    </div>
+    <div id="fatRegion" style="font-size:.8rem;color:var(--muted);margin-top:.5rem;line-height:1.5"></div>
+  </div>
+
+  <!-- Postura -->
+  <div class="section" style="border-top:1px solid var(--border)">
+    <div class="sec-title">📐 Mapa Postural</div>
+    <div class="body-map-wrap">
+      <div class="body-map-col">
+        <div class="body-map-lbl">FRENTE</div>
+        <svg id="bodyFront" viewBox="0 0 80 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- Silhouette -->
+          <g fill="none" stroke="#2A3550" stroke-width="1.5">
+            <ellipse cx="40" cy="12" rx="11" ry="12"/><!-- head -->
+            <line x1="40" y1="24" x2="40" y2="30"/><!-- neck -->
+            <path d="M22,30 Q40,27 58,30 L62,80 Q40,84 18,80 Z"/><!-- torso -->
+            <path d="M22,32 L10,65 Q9,70 13,71 L18,70 L22,55"/><!-- left arm -->
+            <path d="M58,32 L70,65 Q71,70 67,71 L62,70 L58,55"/><!-- right arm -->
+            <path d="M28,80 L24,140 Q24,145 28,145 L34,145 L36,95"/><!-- left leg -->
+            <path d="M52,80 L56,140 Q56,145 52,145 L46,145 L44,95"/><!-- right leg -->
+            <path d="M24,140 Q24,148 28,150 L34,150 L35,145"/><!-- left foot -->
+            <path d="M56,140 Q56,148 52,150 L46,150 L45,145"/><!-- right foot -->
+          </g>
+          <!-- Posture markers - will be colored by JS -->
+          <circle id="fm-head" cx="40" cy="12" r="5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-lshoulder" cx="22" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-rshoulder" cx="58" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-spine-t" cx="40" cy="50" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-spine-l" cx="40" cy="72" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-pelvis" cx="40" cy="82" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-lknee" cx="30" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="fm-rknee" cx="50" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+        </svg>
+      </div>
+      <div class="body-map-col">
+        <div class="body-map-lbl">COSTAS</div>
+        <svg id="bodyBack" viewBox="0 0 80 180" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#2A3550" stroke-width="1.5">
+            <ellipse cx="40" cy="12" rx="11" ry="12"/>
+            <line x1="40" y1="24" x2="40" y2="30"/>
+            <path d="M22,30 Q40,27 58,30 L62,80 Q40,84 18,80 Z"/>
+            <path d="M22,32 L10,65 Q9,70 13,71 L18,70 L22,55"/>
+            <path d="M58,32 L70,65 Q71,70 67,71 L62,70 L58,55"/>
+            <path d="M28,80 L24,140 Q24,145 28,145 L34,145 L36,95"/>
+            <path d="M52,80 L56,140 Q56,145 52,145 L46,145 L44,95"/>
+            <path d="M24,140 Q24,148 28,150 L34,150 L35,145"/>
+            <path d="M56,140 Q56,148 52,150 L46,150 L45,145"/>
+          </g>
+          <circle id="bm-head" cx="40" cy="12" r="5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-lshoulder" cx="22" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-rshoulder" cx="58" cy="31" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-spine-t" cx="40" cy="50" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-spine-l" cx="40" cy="72" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-pelvis" cx="40" cy="82" r="4.5" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-lknee" cx="30" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+          <circle id="bm-rknee" cx="50" cy="118" r="4" fill="#2A3550" stroke="none" opacity=".8"/>
+        </svg>
+      </div>
+    </div>
+    <div class="posture-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Bom</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--amber)"></div>Atenção</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Corrigir</div>
+    </div>
+    <div class="posture-cards" id="postureCards"></div>
+  </div>
+
+  <!-- Photos annotated -->
+  <div style="border-top:1px solid var(--border)">
+    <div class="section" style="padding-bottom:.75rem">
+      <div class="sec-title">📷 Fotos com Anotações</div>
+    </div>
+    <div class="photo-tabs">
+      <div class="ptab active" onclick="switchTab(0)">Frente</div>
+      <div class="ptab" onclick="switchTab(1)">Lado Direito</div>
+      <div class="ptab" onclick="switchTab(2)">Costas</div>
+    </div>
+    <div class="photo-panel active" id="pp0"></div>
+    <div class="photo-panel" id="pp1"></div>
+    <div class="photo-panel" id="pp2"></div>
+  </div>
+
+  <!-- Assimetrias -->
+  <div class="section" style="border-top:1px solid var(--border)">
+    <div class="sec-title">⚖️ Assimetrias Detectadas</div>
+    <div class="asym-list" id="asymList"></div>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="section" style="border-top:1px solid var(--border)">
+    <div class="sec-title">🎯 Recomendações Prioritárias</div>
+    <div id="recCards"></div>
+  </div>
+
+  <div style="padding:0 1.25rem">
+    <div style="background:rgba(124,58,237,.09);border:1px solid rgba(124,58,237,.22);border-radius:10px;padding:.875rem 1rem;font-size:.78rem;color:#A78BFA;line-height:1.6;margin-bottom:1.25rem">
+      ⚠ <strong>Aviso:</strong> Estimativa visual por IA com fins educativos. Não substitui avaliação de fisioterapeuta, médico ou educador físico.
     </div>
   </div>
 </div>
 
 <script>
 'use strict';
-let stream=null, facingMode='user';
 
-// ── INIT ──
+const STEPS=[
+  {icon:'🧍',num:'PASSO 1 DE 3 — FRENTE',instr:'Fique de frente para a câmera. Braços relaxados ao lado do corpo. Pés na largura dos ombros.'},
+  {icon:'🚶',num:'PASSO 2 DE 3 — LADO DIREITO',instr:'Vire 90° para a direita. Perfil direito voltado para a câmera. Braços relaxados.'},
+  {icon:'🔄',num:'PASSO 3 DE 3 — COSTAS',instr:'Vire completamente de costas para a câmera. Mantenha postura natural.'}
+];
+
+let state={
+  apiKey:'',weight:0,height:0,bmi:0,
+  captures:[null,null,null],
+  step:0,stream:null,scanning:false
+};
+
+// ── SCREENS ──
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on')}
+function showCfg(){stopCam();show('scrConfig')}
+function showSetup(){stopCam();show('scrSetup')}
+function saveKey(){
+  const k=document.getElementById('apiKey').value.trim();
+  if(!k.startsWith('sk-')){alert('Chave inválida.');return;}
+  localStorage.setItem('bsk',k);state.apiKey=k;show('scrSetup');
+}
+function cancelScan(){stopCam();show('scrSetup')}
+
 window.addEventListener('load',()=>{
-  if(localStorage.getItem('bioscan_key')) showMain();
+  const k=localStorage.getItem('bsk');
+  if(k){state.apiKey=k;show('scrSetup')}
 });
 
-function saveConfig(){
-  const k=document.getElementById('apiKeyInput').value.trim();
-  if(!k.startsWith('sk-')){alert('Chave inválida. Deve começar com sk-ant-…');return;}
-  localStorage.setItem('bioscan_key',k);
-  showMain();
-}
-function showConfig(){
-  const k=localStorage.getItem('bioscan_key')||'';
-  document.getElementById('apiKeyInput').value=k;
-  showScreen('configScreen');
-  stopCamera();
-}
-function showMain(){
-  showScreen('mainScreen');
-  initCamera();
-}
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// ── SETUP ──
+function startScan(){
+  const w=document.getElementById('weight').value;
+  const h=document.getElementById('height').value;
+  if(!w||!h){alert('Informe peso e altura.');return;}
+  state.weight=parseFloat(w);state.height=parseFloat(h);
+  state.bmi=(state.weight/Math.pow(state.height/100,2)).toFixed(1);
+  state.captures=[null,null,null];state.step=0;
+  show('scrScan');
+  resetScanUI();
+  initCam();
 }
 
 // ── CAMERA ──
-async function initCamera(){
+async function initCam(){
   try{
-    stopCamera();
-    stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode,width:{ideal:1080},height:{ideal:1440}},audio:false
+    stopCam();
+    state.stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'user',width:{ideal:1080},height:{ideal:1920}},audio:false
     });
     const v=document.getElementById('video');
-    v.srcObject=stream;
-    v.style.transform=facingMode==='user'?'scaleX(-1)':'scaleX(1)';
-    setStatus('ready','câmera ativa — pronto para scan');
-    document.getElementById('btnScan').disabled=false;
+    v.srcObject=state.stream;
+    v.style.transform='scaleX(-1)';
+    setStatus('ready','câmera ativa — pronto para capturar');
+    document.getElementById('btnCapture').disabled=false;
   }catch(e){
-    setStatus('','erro ao acessar câmera: '+e.message);
-    document.getElementById('btnScan').disabled=true;
+    setStatus('','erro: '+e.message);
+    document.getElementById('btnCapture').disabled=true;
   }
 }
-function stopCamera(){
-  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+function stopCam(){
+  if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null;}
 }
-function flipCamera(){
-  facingMode=facingMode==='user'?'environment':'user';
-  initCamera();
-}
-function setStatus(state,txt){
-  document.getElementById('statusTxt').textContent=txt;
+function setStatus(s,t){
+  document.getElementById('stxt').textContent=t;
   const d=document.getElementById('sdot');
-  d.className='sdot'+(state?' '+state:'');
+  d.className='sdot'+(s?' '+s:'');
 }
 
 // ── SCAN FLOW ──
-async function startScan(){
-  const w=document.getElementById('weight').value;
-  const h=document.getElementById('height').value;
-  if(!w||!h){alert('Informe peso e altura antes de iniciar o scan.');return;}
+function resetScanUI(){
+  updateStepUI();
+  [0,1,2].forEach(i=>{
+    document.getElementById('ts'+i).className='thumb-slot'+(i===0?' active':'');
+  });
+}
 
-  document.getElementById('btnScan').disabled=true;
-  setStatus('scanning','preparando scan…');
+function updateStepUI(){
+  const s=STEPS[state.step];
+  document.getElementById('stepIcon').textContent=s.icon;
+  document.getElementById('stepNum').textContent=s.num;
+  document.getElementById('stepInstr').textContent=s.instr;
+  [0,1,2].forEach(i=>{
+    const d=document.getElementById('pd'+i);
+    if(i<state.step)d.className='prog-dot done';
+    else if(i===state.step)d.className='prog-dot active';
+    else d.className='prog-dot';
+  });
+}
+
+async function doCapture(){
+  if(state.scanning)return;
+  state.scanning=true;
+  document.getElementById('btnCapture').disabled=true;
+  setStatus('scanning','preparando…');
 
   // Countdown
-  const cd=document.getElementById('countdown');
-  const cn=document.getElementById('cnum');
+  const cd=document.getElementById('cdOverlay');
+  const cn=document.getElementById('cdNum');
   cd.classList.add('on');
   for(let i=3;i>=1;i--){
     cn.textContent=i;
-    cn.style.animation='none';
-    cn.offsetHeight;
-    cn.style.animation='cpulse 1s ease-out';
+    cn.style.animation='none';cn.offsetHeight;cn.style.animation='cdp 1s ease-out';
     await sleep(1000);
   }
   cd.classList.remove('on');
 
-  // Scanning animation
+  // Scan animation
   setStatus('scanning','escaneando…');
   document.getElementById('scanGrid').classList.add('on');
   document.getElementById('scanBeam').classList.add('on');
-  await sleep(2400);
+  await sleep(2200);
 
-  // Capture frame
-  const imgData=captureFrame();
-
+  // Capture
+  const img=captureFrame();
   document.getElementById('scanGrid').classList.remove('on');
   document.getElementById('scanBeam').classList.remove('on');
 
-  // Calc BMI for badge
-  const bmi=(parseFloat(w)/Math.pow(parseFloat(h)/100,2)).toFixed(1);
+  // Store and show thumbnail
+  state.captures[state.step]=img;
+  const slot=document.getElementById('ts'+state.step);
+  const thumb=document.getElementById('th'+state.step);
+  thumb.src=img;slot.classList.add('captured');
 
-  // Switch to results
-  resetResultsUI();
-  document.getElementById('captureThumb').src=imgData;
-  document.getElementById('thumbBadge').textContent='IMC '+bmi+' · '+bmiCat(bmi);
-  showScreen('resultsScreen');
-
-  // Progressive step animation
-  const delays=[0,2500,6000,10000];
-  delays.forEach((d,i)=>setTimeout(()=>{
-    if(i>0)document.getElementById('s'+i).className='step done';
-    document.getElementById('s'+(i+1)).className='step on';
-  },d));
-
-  // Call API
-  try{
-    const result=await analyze(imgData,w,h,bmi);
-    showResults(result);
-  }catch(err){
-    showError(err.message);
+  if(state.step<2){
+    // Next step
+    state.step++;
+    updateStepUI();
+    document.getElementById('ts'+state.step).classList.add('active');
+    setStatus('ready','ótimo! agora '+(state.step===1?'vire de lado direito':'vire de costas'));
+    document.getElementById('btnCapture').disabled=false;
+  }else{
+    // All done — go to processing
+    stopCam();
+    showProcessing();
   }
-
-  document.getElementById('btnScan').disabled=false;
-  setStatus('ready','câmera ativa — pronto para scan');
+  state.scanning=false;
 }
 
 function captureFrame(){
   const v=document.getElementById('video');
-  const c=document.getElementById('canvas');
-  c.width=v.videoWidth;
-  c.height=v.videoHeight;
+  const c=document.getElementById('mainCanvas');
+  c.width=v.videoWidth;c.height=v.videoHeight;
   const ctx=c.getContext('2d');
-  if(facingMode==='user'){ctx.translate(c.width,0);ctx.scale(-1,1);}
+  ctx.translate(c.width,0);ctx.scale(-1,1);
   ctx.drawImage(v,0,0);
-  return c.toDataURL('image/jpeg',.88);
+  return c.toDataURL('image/jpeg',.85);
 }
 
-function resetResultsUI(){
-  document.getElementById('loadingState').style.display='block';
-  document.getElementById('resultsOut').style.display='none';
-  ['s1','s2','s3','s4'].forEach((id,i)=>{
-    document.getElementById(id).className='step'+(i===0?' on':'');
+// ── PROCESSING ──
+function showProcessing(){
+  show('scrProc');
+  ['pt0','pt1','pt2'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(state.captures[i])el.src=state.captures[i];
   });
+  resetProcSteps();
+  const delays=[0,3000,7000,11000,15000];
+  delays.forEach((d,i)=>setTimeout(()=>{
+    if(i>0)document.getElementById('ps'+i).className='pstep done';
+    if(i<5)document.getElementById('ps'+(i+1)).className='pstep on';
+  },d));
+  analyze();
+}
+
+function resetProcSteps(){
+  for(let i=1;i<=5;i++){
+    document.getElementById('ps'+i).className='pstep'+(i===1?' on':'');
+  }
 }
 
 // ── CLAUDE API ──
-async function analyze(imgDataUrl,weight,height,bmi){
-  const key=localStorage.getItem('bioscan_key');
-  const b64=imgDataUrl.split(',')[1];
+async function analyze(){
+  const key=state.apiKey||localStorage.getItem('bsk');
+  const b64s=state.captures.map(d=>d.split(',')[1]);
+  const bmi=state.bmi;
+  const cat=bmiCat(bmi);
 
-  const system=`Você é um especialista sênior em avaliação física, biomecânica postural e fisiologia do exercício. Analise imagens de pessoas e produza avaliações completas, honestas e específicas. Nunca seja genérico. Se não puder ver algo com clareza, diga isso explicitamente em vez de inventar dados.`;
+  const sys=`Você é um especialista em avaliação física, biomecânica postural e fisiologia do exercício. Analisa imagens corporais e produz avaliações estruturadas e precisas. Seja honesto, específico, nunca genérico. Retorne APENAS JSON válido, sem texto extra, sem markdown, sem \`\`\`.`;
 
-  const prompt=`Analise esta pessoa com os seguintes dados mensurados:
-• Peso: ${weight} kg
-• Altura: ${height} cm
-• IMC: ${bmi} (${bmiCat(bmi)})
+  const prompt=`Analise as 3 imagens: FRENTE (img 1), LADO DIREITO (img 2), COSTAS (img 3).
+Dados: Peso ${state.weight}kg · Altura ${state.height}cm · IMC ${bmi} (${cat})
 
-Produza uma avaliação completa e bem estruturada. Use exatamente estes títulos de seção:
+Retorne SOMENTE este JSON (sem texto antes ou depois):
+{
+  "score_geral": <0-100>,
+  "resumo": "<2-3 frases diretas sobre os principais achados>",
+  "composicao": {
+    "gordura_min": <número>,
+    "gordura_max": <número>,
+    "musculo_score": <0-100>,
+    "morfologia": "<ecto|meso|endo|misto>",
+    "gordura_regiao": "<regiões com mais gordura visível, curto>"
+  },
+  "postura": {
+    "cabeca":          {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
+    "ombros":          {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
+    "coluna_toracica": {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
+    "coluna_lombar":   {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
+    "pelve":           {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"},
+    "joelhos":         {"score":<0-100>,"status":"<bom|atencao|corrigir>","nota":"<texto curto>"}
+  },
+  "assimetrias": ["<texto>","<texto>"],
+  "anotacoes_frente": [{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max 20 chars>"}],
+  "anotacoes_lado":   [{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max 20 chars>"}],
+  "anotacoes_costas": [{"x":<0-100>,"y":<0-100>,"tipo":"<bom|atencao|corrigir>","label":"<max 20 chars>"}],
+  "recomendacoes": [
+    {"prioridade":<1-3>,"area":"<área>","exercicio":"<nome>","instrucao":"<instrução concisa>","tipo":"<fortalecer|alongar|mobilidade|postura>"}
+  ]
+}`;
 
-## 1. COMPOSIÇÃO CORPORAL
-
-Estime visualmente com base na imagem e nos dados fornecidos:
-- % de gordura corporal estimada (ex: "entre 18–22%") — seja honesto quanto à incerteza visual
-- Classificação morfológica (ectomorfo / mesomorfo / endomorfo / misto) com breve justificativa
-- Regiões com maior acúmulo de gordura visível (se aplicável)
-- Aparência da massa muscular: baixa / moderada / boa — quais grupos musculares se destacam visualmente
-
-## 2. ANÁLISE POSTURAL
-
-Avalie cada ponto com base no que é visível:
-- **Cabeça e pescoço**: centralizado, anteriorizado, inclinado lateralmente?
-- **Ombros**: nivelados ou desnivelados (qual lado mais alto)?
-- **Coluna**: lordose lombar (normal / aumentada / reduzida), cifose torácica, sinais de desvio lateral (escoliose)?
-- **Pelve**: aparente anteversão, retroversão ou desnivelamento lateral?
-- **Joelhos**: alinhados, valgo (joelhos para dentro), varo (joelhos para fora), hiperextensão?
-
-## 3. ASSIMETRIAS E DESEQUILÍBRIOS
-
-- Diferenças visuais entre lado esquerdo e direito (braços, ombros, pernas, quadril, trapézio)
-- Possíveis compensações musculares visíveis
-- Se algum membro parece visivelmente mais desenvolvido que o oposto
-
-## 4. RECOMENDAÇÕES PRIORITÁRIAS
-
-Com base nos achados acima, indique especificamente:
-- Top 3 exercícios ou práticas para correção das alterações encontradas (com nome e breve instrução)
-- Grupos musculares a FORTALECER vs. ALONGAR prioritariamente
-- Se recomenda consulta com fisioterapeuta, ortopedista ou personal trainer especializado
-
-Seja específico e direto. Se a postura for boa em algum ponto, afirme isso. Não invente problemas que não são visíveis na imagem.`;
-
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':key,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model:'claude-opus-4-6',
-      max_tokens:2048,
-      system,
-      messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
-        {type:'text',text:prompt}
-      ]}]
-    })
-  });
-
-  if(!res.ok){
-    const err=await res.json().catch(()=>({error:{message:'Erro desconhecido'}}));
-    throw new Error(err.error?.message||'Erro HTTP '+res.status);
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-opus-4-6',
+        max_tokens:2048,
+        system:sys,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[0]}},
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[1]}},
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64s[2]}},
+          {type:'text',text:prompt}
+        ]}]
+      })
+    });
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+res.status);}
+    const data=await res.json();
+    let txt=data.content[0].text.trim();
+    txt=txt.replace(/^```(?:json)?/,'').replace(/```$/,'').trim();
+    const json=JSON.parse(txt);
+    renderResults(json);
+  }catch(e){
+    renderError(e.message);
   }
-
-  const data=await res.json();
-  return data.content[0].text;
 }
 
 // ── RENDER RESULTS ──
-function showResults(text){
-  document.getElementById('loadingState').style.display='none';
-  const card=document.getElementById('resultsCard');
+function renderResults(d){
+  show('scrResults');
 
-  // Parse markdown-like headings and formatting
-  let html=text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^## .+?COMPOSIÇÃO CORPORAL.*$/gm,'<h3>🔬 Composição Corporal</h3>')
-    .replace(/^## .+?POSTURAL.*$/gm,'<h3>📐 Análise Postural</h3>')
-    .replace(/^## .+?ASSIMETRIAS.*$/gm,'<h3>⚖️ Assimetrias e Desequilíbrios</h3>')
-    .replace(/^## .+?RECOMENDAÇÕES.*$/gm,'<h3>🎯 Recomendações Prioritárias</h3>')
-    .replace(/^## (.+)$/gm,'<h3>$1</h3>')
-    .replace(/^- (.+)$/gm,'<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, m => '<ul>'+m+'</ul>')
-    .replace(/\n{2,}/g,'\n')
-    .replace(/\n/g,'<br>');
+  // Score ring
+  const score=clamp(d.score_geral||0,0,100);
+  const circumference=339.3;
+  const offset=circumference*(1-score/100);
+  setTimeout(()=>{
+    document.getElementById('scoreArc').style.strokeDashoffset=offset;
+    const arc=document.getElementById('scoreArc');
+    arc.style.stroke=score>=70?'#10B981':score>=50?'#F59E0B':'#EF4444';
+  },100);
+  document.getElementById('scoreVal').textContent=score;
+  const badge=document.getElementById('scoreBadge');
+  if(score>=75){badge.innerHTML='<span class="score-badge badge-green">Boa forma geral</span>';}
+  else if(score>=50){badge.innerHTML='<span class="score-badge badge-amber">Melhorias recomendadas</span>';}
+  else{badge.innerHTML='<span class="score-badge badge-red">Atenção necessária</span>';}
 
-  card.innerHTML=html;
-  document.getElementById('resultsOut').style.display='block';
+  // Stats
+  const c=d.composicao||{};
+  const fatStr=c.gordura_min&&c.gordura_max?`${c.gordura_min}–${c.gordura_max}%`:'—%';
+  document.getElementById('statFat').textContent=fatStr;
+  document.getElementById('statBmi').textContent=state.bmi;
+  document.getElementById('statMorpho').textContent=(c.morfologia||'—').charAt(0).toUpperCase()+(c.morfologia||'').slice(1);
+
+  // Resumo
+  document.getElementById('resumoBox').textContent=d.resumo||'—';
+
+  // Bars
+  const fatMid=c.gordura_min&&c.gordura_max?(c.gordura_min+c.gordura_max)/2:0;
+  document.getElementById('fatVal').textContent=fatStr;
+  document.getElementById('muscleVal').textContent=(c.musculo_score||0)+'%';
+  if(c.gordura_regiao)document.getElementById('fatRegion').textContent='Regiões: '+c.gordura_regiao;
+  setTimeout(()=>{
+    document.getElementById('fatBar').style.width=Math.min(fatMid*1.5,100)+'%';
+    document.getElementById('muscleBar').style.width=(c.musculo_score||0)+'%';
+  },400);
+
+  // Body map
+  const p=d.postura||{};
+  const markers={
+    cabeca:['fm-head','bm-head'],
+    ombros:['fm-lshoulder','fm-rshoulder','bm-lshoulder','bm-rshoulder'],
+    coluna_toracica:['fm-spine-t','bm-spine-t'],
+    coluna_lombar:['fm-spine-l','bm-spine-l'],
+    pelve:['fm-pelvis','bm-pelvis'],
+    joelhos:['fm-lknee','fm-rknee','bm-lknee','bm-rknee']
+  };
+  Object.entries(markers).forEach(([key,ids])=>{
+    const item=p[key];if(!item)return;
+    const clr=statusColor(item.status);
+    ids.forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',clr);});
+  });
+
+  // Posture cards
+  const postureInfo=[
+    {key:'cabeca',icon:'🧠',name:'Cabeça e Pescoço'},
+    {key:'ombros',icon:'💪',name:'Ombros'},
+    {key:'coluna_toracica',icon:'🦴',name:'Coluna Torácica'},
+    {key:'coluna_lombar',icon:'🦴',name:'Coluna Lombar'},
+    {key:'pelve',icon:'⚡',name:'Pelve'},
+    {key:'joelhos',icon:'🦵',name:'Joelhos'}
+  ];
+  const pc=document.getElementById('postureCards');
+  pc.innerHTML=postureInfo.map(({key,icon,name})=>{
+    const item=p[key]||{score:0,status:'atencao',nota:'-'};
+    const st=item.status||'atencao';
+    return `<div class="posture-card ${st}">
+      <div class="pc-icon">${icon}</div>
+      <div class="pc-body"><div class="pc-name">${name}</div><div class="pc-note">${item.nota||'—'}</div></div>
+      <div class="pc-score ${st}">${item.score||'—'}</div>
+    </div>`;
+  }).join('');
+
+  // Annotated photos
+  const anns=[d.anotacoes_frente||[],d.anotacoes_lado||[],d.anotacoes_costas||[]];
+  const labels=['Frente','Lado Direito','Costas'];
+  [0,1,2].forEach(i=>{
+    const panel=document.getElementById('pp'+i);
+    const img=state.captures[i];
+    if(!img){panel.innerHTML='<div class="no-ann">Imagem não disponível</div>';return;}
+    const canvasId='annCanvas'+i;
+    panel.innerHTML=`<div class="annotated-photo"><canvas id="${canvasId}"></canvas></div><div style="font-size:.75rem;color:var(--muted);margin-top:.5rem;text-align:center">${labels[i]}</div>`;
+    drawAnnotations(canvasId,img,anns[i]);
+  });
+
+  // Asymmetries
+  const al=document.getElementById('asymList');
+  const asym=d.assimetrias||[];
+  al.innerHTML=asym.length?asym.map(a=>`<div class="asym-item">${escHtml(a)}</div>`).join(''):'<div class="asym-item">Nenhuma assimetria significativa detectada</div>';
+
+  // Recommendations
+  const rc=document.getElementById('recCards');
+  const recs=d.recomendacoes||[];
+  rc.innerHTML=recs.sort((a,b)=>(a.prioridade||3)-(b.prioridade||3)).map(r=>`
+    <div class="rec-card">
+      <div class="rec-hdr">
+        <div class="rec-prio p${r.prioridade||3}">#${r.prioridade||'—'}</div>
+        <div class="rec-area">${escHtml(r.area||'—')}</div>
+        <div class="rec-type">${escHtml(r.tipo||'')}</div>
+      </div>
+      <div class="rec-exercise">${escHtml(r.exercicio||'—')}</div>
+      <div class="rec-instr">${escHtml(r.instrucao||'—')}</div>
+    </div>`).join('');
 }
 
-function showError(msg){
-  document.getElementById('loadingState').style.display='none';
-  document.getElementById('resultsCard').innerHTML=
-    `<div class="err-box"><strong>Erro na análise</strong><br><br>${escHtml(msg)}<br><br><small style="opacity:.7">Verifique sua chave de API e conexão com a internet.</small></div>`;
-  document.getElementById('resultsOut').style.display='block';
+function renderError(msg){
+  show('scrResults');
+  document.getElementById('resumoBox').innerHTML=`<div class="err-box"><strong>Erro na análise</strong><br><br>${escHtml(msg)}<br><br><small style="opacity:.7">Verifique sua chave de API e conexão.</small></div>`;
 }
 
-function backToMain(){
-  showScreen('mainScreen');
-  if(!stream)initCamera();
+// ── PHOTO ANNOTATIONS ──
+function drawAnnotations(canvasId,imgSrc,annotations){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const img=new Image();
+  img.onload=()=>{
+    canvas.width=img.width;canvas.height=img.height;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0);
+    if(!annotations||!annotations.length)return;
+    annotations.forEach(a=>{
+      const x=(a.x/100)*img.width;
+      const y=(a.y/100)*img.height;
+      const color=statusColor(a.tipo);
+      const r=Math.max(img.width*.04,20);
+      // Outer glow ring
+      ctx.beginPath();ctx.arc(x,y,r+4,0,Math.PI*2);
+      ctx.strokeStyle=color+'60';ctx.lineWidth=3;ctx.stroke();
+      // Main circle
+      ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+      ctx.fillStyle=color+'30';ctx.fill();
+      // Label background
+      const fs=Math.max(img.width*.025,13);
+      ctx.font=`bold ${fs}px Inter, sans-serif`;
+      const tw=ctx.measureText(a.label||'').width;
+      const lx=x+r+6;const ly=y+4;
+      ctx.fillStyle='rgba(11,15,26,.78)';
+      ctx.beginPath();ctx.roundRect(lx-4,ly-fs,tw+10,fs+6,4);ctx.fill();
+      ctx.fillStyle=color;ctx.fillText(a.label||'',lx+1,ly);
+    });
+  };
+  img.src=imgSrc;
+}
+
+// ── TABS ──
+function switchTab(i){
+  document.querySelectorAll('.ptab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  document.querySelectorAll('.photo-panel').forEach((p,idx)=>p.classList.toggle('active',idx===i));
 }
 
 // ── UTILS ──
-function bmiCat(bmi){
-  const b=parseFloat(bmi);
-  if(b<18.5)return'abaixo do peso';
-  if(b<25)return'peso normal';
-  if(b<30)return'sobrepeso';
-  if(b<35)return'obesidade grau I';
-  return'obesidade grau II+';
-}
-function escHtml(t){
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function statusColor(s){return s==='bom'?'#10B981':s==='corrigir'?'#EF4444':'#F59E0B';}
+function bmiCat(b){b=parseFloat(b);if(b<18.5)return'abaixo do peso';if(b<25)return'peso normal';if(b<30)return'sobrepeso';if(b<35)return'obesidade grau I';return'obesidade grau II+';}
+function clamp(v,a,b){return Math.min(Math.max(v,a),b);}
+function escHtml(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 </script>
 </body>
